@@ -48,7 +48,7 @@ export default function ProjectsApp() {
         {/* Filter controls bar */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
           {/* Category Tabs */}
-          <div className="flex items-center gap-1.5 p-1 rounded-lg bg-black/30 border border-white/5 w-fit">
+          <div className="flex items-center gap-1.5 p-1 rounded-lg bg-black/30 border border-white/5 w-fit max-w-full overflow-x-auto">
             {categories.map((cat) => (
               <button
                 key={cat.id}

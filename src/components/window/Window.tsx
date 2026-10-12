@@ -174,7 +174,7 @@ export const Window = React.memo(function Window({ id, children }: WindowProps) 
         />
 
         {/* Window Content Container */}
-        <div className="flex-1 w-full overflow-auto bg-[#1E1E1E] text-white">
+        <div className="flex-1 w-full overflow-y-auto overflow-x-hidden bg-[#1E1E1E] text-white">
           {children}
         </div>
       </div>
