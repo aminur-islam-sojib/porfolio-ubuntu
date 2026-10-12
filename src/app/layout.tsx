@@ -16,9 +16,46 @@ const ubuntuMono = Ubuntu_Mono({
   display: "swap",
 });
 
+import { profileData } from "@/data/profile";
+import { JsonLd } from "@/components/seo/JsonLd";
+
 export const metadata: Metadata = {
-  title: "Sojib Ahmed — Full-Stack Developer",
-  description: "Ubuntu-themed interactive developer portfolio featuring full-stack projects, skills, terminal, and experience.",
+  metadataBase: new URL(profileData.website || "https://sojib.dev"),
+  title: {
+    default: `${profileData.name} — ${profileData.title}`,
+    template: `%s | ${profileData.name}`,
+  },
+  description: `${profileData.name} is a ${profileData.title}. Interactive Ubuntu 24.04 Linux desktop web portfolio featuring software projects, architecture case studies, and live terminal.`,
+  keywords: [
+    profileData.name,
+    profileData.title,
+    "Full-Stack Developer",
+    "React",
+    "Next.js",
+    "TypeScript",
+    "Node.js",
+    "Ubuntu Portfolio",
+    "Software Engineer",
+  ],
+  authors: [{ name: profileData.name, url: profileData.website }],
+  creator: profileData.name,
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: profileData.website,
+    title: `${profileData.name} — ${profileData.title}`,
+    description: "Interactive Ubuntu 24.04 desktop environment running in your browser.",
+    siteName: `${profileData.name} Portfolio`,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${profileData.name} — ${profileData.title}`,
+    description: "Interactive Ubuntu 24.04 desktop environment developer portfolio.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({
@@ -28,7 +65,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${ubuntu.variable} ${ubuntuMono.variable} h-full antialiased`}>
-      <body className="h-full w-full overflow-hidden font-sans text-white">
+      <head>
+        <JsonLd />
+      </head>
+      <body className="min-h-full w-full bg-[#111111] text-white font-sans">
         {children}
       </body>
     </html>
