@@ -5,6 +5,7 @@ import { Rnd, RndDragCallback, RndResizeCallback } from "react-rnd";
 import { useWindowStore } from "@/store/windows";
 import { TitleBar } from "@/components/window/TitleBar";
 import { clampWindowPosition } from "@/lib/geometry";
+import { getSnapZone } from "@/lib/snap";
 import { cn } from "@/lib/cn";
 
 export interface WindowProps {
@@ -23,15 +24,68 @@ export const Window = React.memo(function Window({ id, children }: WindowProps) 
     return null;
   }
 
-  const handleDragStart: RndDragCallback = () => {
+  const getPointerCoords = (e: MouseEvent | TouchEvent | React.MouseEvent | React.TouchEvent | unknown) => {
+    const mouse = e as MouseEvent;
+    if (mouse.clientX !== undefined) return { x: mouse.clientX, y: mouse.clientY };
+    const touch = e as TouchEvent;
+    if (touch.touches && touch.touches[0]) {
+      return { x: touch.touches[0].clientX, y: touch.touches[0].clientY };
+    }
+    return null;
+  };
+
+  const handleDragStart: RndDragCallback = (e, d) => {
     setIsDragging(true);
     useWindowStore.getState().focusWindow(id);
+
+    // If dragging from snapped or maximized state, unstick and restore proportions
+    if (win.snapZone !== "none" || win.isMaximized) {
+      const coords = getPointerCoords(e);
+      const restoredWidth = win.prevBounds.width;
+      const restoredHeight = win.prevBounds.height;
+      const cursorX = coords ? coords.x : d.x;
+      const cursorY = coords ? coords.y : d.y;
+
+      const newX = Math.max(56, cursorX - restoredWidth / 2);
+      const newY = Math.max(30, cursorY - 20);
+
+      useWindowStore.getState().updateBounds(
+        id,
+        { x: newX, y: newY },
+        { width: restoredWidth, height: restoredHeight }
+      );
+      useWindowStore.setState((state) => ({
+        windows: {
+          ...state.windows,
+          [id]: {
+            ...state.windows[id],
+            isMaximized: false,
+            snapZone: "none",
+          },
+        },
+      }));
+    }
+  };
+
+  const handleDrag: RndDragCallback = (e) => {
+    const coords = getPointerCoords(e);
+    if (coords) {
+      const zone = getSnapZone(coords.x, coords.y);
+      useWindowStore.getState().setPreviewSnapZone(zone);
+    }
   };
 
   const handleDragStop: RndDragCallback = (_e, d) => {
     setIsDragging(false);
-    const clamped = clampWindowPosition(d.x, d.y, win.size.width, win.size.height);
-    useWindowStore.getState().updateBounds(id, { x: clamped.x, y: clamped.y }, win.size);
+    const snapZone = useWindowStore.getState().previewSnapZone;
+
+    if (snapZone !== "none") {
+      useWindowStore.getState().applySnap(id, snapZone);
+    } else {
+      useWindowStore.getState().setPreviewSnapZone("none");
+      const clamped = clampWindowPosition(d.x, d.y, win.size.width, win.size.height);
+      useWindowStore.getState().updateBounds(id, { x: clamped.x, y: clamped.y }, win.size);
+    }
   };
 
   const handleResizeStop: RndResizeCallback = (_e, _dir, elementRef, _delta, position) => {
@@ -78,9 +132,10 @@ export const Window = React.memo(function Window({ id, children }: WindowProps) 
       minWidth={win.minWidth}
       minHeight={win.minHeight}
       dragHandleClassName="window-drag-handle"
-      disableDragging={win.isMaximized}
+      disableDragging={false}
       enableResizing={!win.isMaximized}
       onDragStart={handleDragStart}
+      onDrag={handleDrag}
       onDragStop={handleDragStop}
       onResizeStop={handleResizeStop}
       style={{
@@ -98,6 +153,8 @@ export const Window = React.memo(function Window({ id, children }: WindowProps) 
           "h-full w-full flex flex-col overflow-hidden bg-[var(--color-window-bg)] border transition-shadow duration-200 select-auto animate-in fade-in zoom-in-[0.98] duration-150",
           win.isMaximized
             ? "rounded-none border-none shadow-none"
+            : win.snapZone !== "none"
+            ? "rounded-[6px] border-white/10"
             : "rounded-[var(--window-radius)] border-white/10",
           isFocused
             ? "shadow-[var(--shadow-window)] ring-1 ring-white/10"
@@ -126,4 +183,3 @@ export const Window = React.memo(function Window({ id, children }: WindowProps) 
 });
 
 Window.displayName = "Window";
-

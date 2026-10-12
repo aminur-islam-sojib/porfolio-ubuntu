@@ -5,11 +5,19 @@ import { Wallpaper } from "@/components/shell/Wallpaper";
 import { TopBar } from "@/components/shell/TopBar";
 import { Dock } from "@/components/shell/Dock";
 import { AppIcon } from "@/components/shell/AppIcon";
+import { SnapPreview } from "@/components/shell/SnapPreview";
+import { AltTabSwitcher } from "@/components/shell/AltTabSwitcher";
 import { WindowManager } from "@/components/window/WindowManager";
 import { useWindowStore } from "@/store/windows";
+import { useHotkeys } from "@/hooks/useHotkeys";
+import { useViewportClamping } from "@/hooks/useViewportClamping";
 
 export function Desktop() {
   const [selectedIcon, setSelectedIcon] = React.useState<string | null>(null);
+
+  // Activate global keyboard hotkeys & viewport resize clamping
+  useHotkeys();
+  useViewportClamping();
 
   const desktopIcons = [
     { id: "files", label: "Home" },
@@ -33,10 +41,16 @@ export function Desktop() {
       {/* 3. Ubuntu Dock */}
       <Dock />
 
-      {/* 4. Window Manager Surface */}
+      {/* 4. Snap Preview Overlay */}
+      <SnapPreview />
+
+      {/* 5. Alt + Tab Application Switcher */}
+      <AltTabSwitcher />
+
+      {/* 6. Window Manager Surface */}
       <WindowManager />
 
-      {/* 5. Desktop Workspace Canvas */}
+      {/* 7. Desktop Workspace Canvas */}
       <main
         className="relative h-full w-full pl-[var(--dock-width)] pt-[var(--topbar-height)] p-6 pointer-events-auto"
         onClick={() => setSelectedIcon(null)}
