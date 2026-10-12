@@ -11,11 +11,13 @@ import {
   Settings,
   Trash2,
   LayoutGrid,
+  Globe,
+  Code2,
 } from "lucide-react";
 
 export interface AppIconProps {
   id: string;
-  size?: number; // pixel size, default 40
+  size?: number;
   className?: string;
 }
 
@@ -83,6 +85,18 @@ export function AppIcon({ id, size = 40, className }: AppIconProps) {
       iconColor: "text-zinc-200",
       shadow: "shadow-slate-950/40",
     },
+    browser: {
+      gradient: "from-[#E67E22] to-[#2980B9]",
+      Icon: Globe,
+      iconColor: "text-white",
+      shadow: "shadow-blue-950/40",
+    },
+    vscode: {
+      gradient: "from-[#007ACC] to-[#005A9E]",
+      Icon: Code2,
+      iconColor: "text-white",
+      shadow: "shadow-sky-950/50",
+    },
     apps: {
       gradient: "from-[#2C3E50] to-[#1A252F]",
       Icon: LayoutGrid,
@@ -106,7 +120,6 @@ export function AppIcon({ id, size = 40, className }: AppIconProps) {
         className
       )}
     >
-      {/* Subtle top gloss highlight */}
       <div className="absolute inset-x-0 top-0 h-1/2 rounded-t-[9px] bg-gradient-to-b from-white/20 to-transparent pointer-events-none" />
       <Icon
         size={glyphSize}
@@ -115,4 +128,3 @@ export function AppIcon({ id, size = 40, className }: AppIconProps) {
     </div>
   );
 }
-
