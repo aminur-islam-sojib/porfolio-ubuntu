@@ -105,3 +105,4 @@ export const UBUNTU_WALLPAPERS: WallpaperItem[] = [
     src: "/wallpapers/warty-heritage.webp",
   },
 ];
+
