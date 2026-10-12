@@ -10,6 +10,9 @@ export interface SystemNotification {
 
 interface SystemStoreState {
   theme: "dark" | "light";
+  isBooting: boolean;
+  isLocked: boolean;
+  isWelcomeOpen: boolean;
   isActivitiesOpen: boolean;
   isAppGridOpen: boolean;
   isQuickSettingsOpen: boolean;
@@ -21,6 +24,11 @@ interface SystemStoreState {
   // Actions
   setTheme: (theme: "dark" | "light") => void;
   toggleTheme: () => void;
+  finishBoot: () => void;
+  reboot: () => void;
+  lockScreen: () => void;
+  unlockScreen: () => void;
+  setWelcomeOpen: (open: boolean) => void;
   toggleActivities: () => void;
   setActivitiesOpen: (open: boolean) => void;
   toggleAppGrid: () => void;
@@ -34,6 +42,9 @@ interface SystemStoreState {
 
 export const useSystemStore = create<SystemStoreState>((set, get) => ({
   theme: "dark",
+  isBooting: false, // controlled by client mount on first load
+  isLocked: false,
+  isWelcomeOpen: false,
   isActivitiesOpen: false,
   isAppGridOpen: false,
   isQuickSettingsOpen: false,
@@ -61,6 +72,36 @@ export const useSystemStore = create<SystemStoreState>((set, get) => ({
   toggleTheme: () => {
     const next = get().theme === "dark" ? "light" : "dark";
     get().setTheme(next);
+  },
+
+  finishBoot: () => {
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("ubuntu_booted", "true");
+    }
+    set({ isBooting: false });
+  },
+
+  reboot: () => {
+    set({
+      isBooting: true,
+      isLocked: false,
+      isWelcomeOpen: false,
+      isQuickSettingsOpen: false,
+      isActivitiesOpen: false,
+      isAppGridOpen: false,
+    });
+  },
+
+  lockScreen: () => {
+    set({ isLocked: true, isQuickSettingsOpen: false });
+  },
+
+  unlockScreen: () => {
+    set({ isLocked: false });
+  },
+
+  setWelcomeOpen: (open) => {
+    set({ isWelcomeOpen: open });
   },
 
   toggleActivities: () => {
@@ -110,4 +151,3 @@ export const useSystemStore = create<SystemStoreState>((set, get) => ({
     }));
   },
 }));
-

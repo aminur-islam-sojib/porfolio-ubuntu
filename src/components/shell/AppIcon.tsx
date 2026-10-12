@@ -13,6 +13,7 @@ import {
   LayoutGrid,
   Globe,
   Code2,
+  Sparkles,
 } from "lucide-react";
 
 export interface AppIconProps {
@@ -102,6 +103,12 @@ export function AppIcon({ id, size = 40, className }: AppIconProps) {
       Icon: LayoutGrid,
       iconColor: "text-white",
       shadow: "shadow-black/50",
+    },
+    welcome: {
+      gradient: "from-[#E95420] via-[#77216F] to-[#2C001E]",
+      Icon: Sparkles,
+      iconColor: "text-white",
+      shadow: "shadow-orange-950/40",
     },
   };
 

@@ -193,11 +193,7 @@ export function QuickSettings() {
         <button
           type="button"
           onClick={() => {
-            useSystemStore.getState().addNotification({
-              title: "Security",
-              message: "Desktop locked. Press any key to return.",
-            });
-            useSystemStore.getState().setQuickSettingsOpen(false);
+            useSystemStore.getState().lockScreen();
           }}
           aria-label="Lock screen"
           className="p-2 rounded-lg hover:bg-white/10 hover:text-white transition-colors"
@@ -208,13 +204,9 @@ export function QuickSettings() {
         <button
           type="button"
           onClick={() => {
-            useSystemStore.getState().addNotification({
-              title: "Power",
-              message: "Power options: Suspend, Restart, or Shut Down.",
-            });
-            useSystemStore.getState().setQuickSettingsOpen(false);
+            useSystemStore.getState().reboot();
           }}
-          aria-label="Power options"
+          aria-label="Restart system"
           className="p-2 rounded-lg hover:bg-white/10 hover:text-red-400 transition-colors"
         >
           <Power className="w-4 h-4" />

@@ -7,6 +7,18 @@ import { useSystemStore } from "@/store/system";
 export function useHotkeys() {
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      const system = useSystemStore.getState();
+      if (system.isBooting || system.isLocked) {
+        return;
+      }
+
+      // Lock Screen shortcut: Super + L
+      if (e.metaKey && (e.key === "l" || e.key === "L")) {
+        e.preventDefault();
+        system.lockScreen();
+        return;
+      }
+
       const state = useWindowStore.getState();
       const { activeId } = state;
 

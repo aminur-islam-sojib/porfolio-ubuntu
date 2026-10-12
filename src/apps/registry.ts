@@ -147,4 +147,16 @@ export const APP_REGISTRY: Record<string, AppMetadata> = {
     isPinned: true,
     component: dynamic(() => import("@/apps/Trash")),
   },
+  welcome: {
+    id: "welcome",
+    title: "Welcome Tour",
+    icon: "welcome",
+    category: "system",
+    defaultWidth: 640,
+    defaultHeight: 520,
+    minWidth: 420,
+    minHeight: 360,
+    isPinned: false,
+    component: dynamic(() => import("@/apps/Welcome")),
+  },
 };

@@ -1,6 +1,7 @@
 import { profileData } from "@/data/profile";
 import { projectsData } from "@/data/projects";
 import { skillsData } from "@/data/skills";
+import { useSystemStore } from "@/store/system";
 
 export const AVAILABLE_COMMANDS = [
   "help",
@@ -16,6 +17,8 @@ export const AVAILABLE_COMMANDS = [
   "uname",
   "date",
   "history",
+  "lock",
+  "reboot",
 ];
 
 const NEOFETCH_ART = `
@@ -58,6 +61,8 @@ export function executeCommand(rawCommand: string): { output: string; shouldClea
           "  uname -a          Print operating system kernel info",
           "  date              Print the current system timestamp",
           "  clear             Clear the terminal display",
+          "  lock              Lock desktop session (GDM lock screen)",
+          "  reboot            Restart system and replay Plymouth boot",
           "  sudo <cmd>        Execute command with elevated privileges",
         ].join("\n"),
       };
@@ -148,6 +153,14 @@ export function executeCommand(rawCommand: string): { output: string; shouldClea
       return {
         output: `[sudo] password for ${profileData.handle}: \nPermission granted. With great power comes great responsibility!`,
       };
+
+    case "lock":
+      useSystemStore.getState().lockScreen();
+      return { output: "Desktop locked." };
+
+    case "reboot":
+      useSystemStore.getState().reboot();
+      return { output: "Restarting Ubuntu desktop..." };
 
     default:
       return {

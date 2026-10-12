@@ -13,6 +13,10 @@ import { QuickSettings } from "@/components/shell/QuickSettings";
 import { NotificationToast } from "@/components/shell/NotificationToast";
 import { ContextMenu } from "@/components/shell/ContextMenu";
 import { WindowManager } from "@/components/window/WindowManager";
+import { BootScreen } from "@/components/shell/BootScreen";
+import { LockScreen } from "@/components/shell/LockScreen";
+import { WelcomeModal } from "@/components/shell/WelcomeModal";
+import { useSystemStore } from "@/store/system";
 import { useHotkeys } from "@/hooks/useHotkeys";
 import { useViewportClamping } from "@/hooks/useViewportClamping";
 
@@ -20,6 +24,29 @@ export function Desktop() {
   const [contextMenuPos, setContextMenuPos] = React.useState<{ x: number; y: number } | null>(
     null
   );
+
+  const isBooting = useSystemStore((state) => state.isBooting);
+
+  // Check initial session boot and welcome status
+  React.useEffect(() => {
+    const hasBooted = sessionStorage.getItem("ubuntu_booted");
+    if (!hasBooted) {
+      useSystemStore.setState({ isBooting: true });
+    } else {
+      const welcomeDismissed = localStorage.getItem("ubuntu_welcome_dismissed");
+      if (!welcomeDismissed) {
+        useSystemStore.setState({ isWelcomeOpen: true });
+      }
+    }
+  }, []);
+
+  const handleBootComplete = React.useCallback(() => {
+    useSystemStore.getState().finishBoot();
+    const welcomeDismissed = localStorage.getItem("ubuntu_welcome_dismissed");
+    if (!welcomeDismissed) {
+      useSystemStore.getState().setWelcomeOpen(true);
+    }
+  }, []);
 
   // Activate global keyboard hotkeys & viewport resize clamping
   useHotkeys();
@@ -76,6 +103,15 @@ export function Desktop() {
 
       {/* 12. Window Manager Surface */}
       <WindowManager />
+
+      {/* 13. First-Visit Welcome Tour Dialog */}
+      <WelcomeModal />
+
+      {/* 14. GDM Lock Screen */}
+      <LockScreen />
+
+      {/* 15. Plymouth Boot Screen */}
+      {isBooting && <BootScreen onComplete={handleBootComplete} />}
     </div>
   );
 }
