@@ -3,6 +3,7 @@
 import * as React from "react";
 import { Wifi, Volume2, Power } from "lucide-react";
 import Link from "next/link";
+import { useSystemStore } from "@/store/system";
 
 function subscribeToClock(callback: () => void) {
   const timer = setInterval(callback, 1000);
@@ -43,6 +44,22 @@ export function TopBar({
     getServerSnapshot
   );
 
+  const handleActivities = () => {
+    if (onActivitiesClick) {
+      onActivitiesClick();
+    } else {
+      useSystemStore.getState().toggleActivities();
+    }
+  };
+
+  const handleQuickSettings = () => {
+    if (onQuickSettingsClick) {
+      onQuickSettingsClick();
+    } else {
+      useSystemStore.getState().toggleQuickSettings();
+    }
+  };
+
   return (
     <header
       role="banner"
@@ -52,7 +69,7 @@ export function TopBar({
       <div className="flex items-center">
         <button
           type="button"
-          onClick={onActivitiesClick}
+          onClick={handleActivities}
           aria-label="Activities Overview"
           className="h-[22px] px-2.5 rounded-full hover:bg-white/10 active:bg-white/15 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ubuntu-orange)] flex items-center"
         >
@@ -83,7 +100,7 @@ export function TopBar({
 
         <button
           type="button"
-          onClick={onQuickSettingsClick}
+          onClick={handleQuickSettings}
           aria-label="Quick Settings menu"
           className="h-[22px] px-2 rounded-full bg-white/5 hover:bg-white/15 active:bg-white/20 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ubuntu-orange)] flex items-center gap-2"
         >
@@ -95,4 +112,3 @@ export function TopBar({
     </header>
   );
 }
-

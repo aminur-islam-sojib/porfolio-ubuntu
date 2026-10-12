@@ -5,6 +5,7 @@ import { APP_REGISTRY, AppMetadata } from "@/apps/registry";
 import { AppIcon } from "@/components/shell/AppIcon";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { useWindowStore } from "@/store/windows";
+import { useSystemStore } from "@/store/system";
 import { cn } from "@/lib/cn";
 
 export interface DockProps {
@@ -106,7 +107,13 @@ export function Dock({ onShowApplicationsClick }: DockProps) {
         <Tooltip content="Show Applications" position="right">
           <button
             type="button"
-            onClick={onShowApplicationsClick}
+            onClick={() => {
+              if (onShowApplicationsClick) {
+                onShowApplicationsClick();
+              } else {
+                useSystemStore.getState().toggleAppGrid();
+              }
+            }}
             aria-label="Show Applications"
             className="w-12 h-12 rounded-[10px] flex items-center justify-center hover:bg-white/10 active:bg-white/20 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ubuntu-orange)] group"
           >

@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useWindowStore } from "@/store/windows";
+import { useSystemStore } from "@/store/system";
 
 export function useHotkeys() {
   React.useEffect(() => {
@@ -14,7 +15,7 @@ export function useHotkeys() {
         e.preventDefault();
         if (!state.isSwitcherOpen) {
           state.setSwitcherOpen(true);
-          state.setSwitcherIndex(1); // switch to the previous (2nd MRU) window
+          state.setSwitcherIndex(1);
         } else {
           state.stepSwitcher(e.shiftKey ? -1 : 1);
         }
@@ -35,7 +36,14 @@ export function useHotkeys() {
         return;
       }
 
-      // 4. Meta (Super) + Arrow keys for snapping and tiling
+      // 4. Meta (Super) key alone -> Toggle Activities
+      if (e.key === "Meta" && !e.ctrlKey && !e.altKey) {
+        e.preventDefault();
+        useSystemStore.getState().toggleActivities();
+        return;
+      }
+
+      // 5. Meta (Super) + Arrow keys for snapping and tiling
       if (e.metaKey && activeId) {
         if (e.key === "ArrowUp") {
           e.preventDefault();
@@ -77,4 +85,3 @@ export function useHotkeys() {
     };
   }, []);
 }
-
