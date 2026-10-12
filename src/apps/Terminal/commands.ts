@@ -172,3 +172,4 @@ export function autoCompleteCommand(current: string): string | null {
   const match = AVAILABLE_COMMANDS.find((cmd) => cmd.startsWith(trimmed));
   return match || null;
 }
+

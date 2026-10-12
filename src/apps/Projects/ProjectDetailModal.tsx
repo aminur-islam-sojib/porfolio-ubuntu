@@ -131,3 +131,4 @@ export function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps
     </div>
   );
 }
+
