@@ -20,10 +20,16 @@ interface SystemStoreState {
   wifiConnected: boolean;
   bluetoothConnected: boolean;
   notifications: SystemNotification[];
+  wallpaper: string;
+  accentColor: string;
+  customWallpapers: string[];
 
   // Actions
   setTheme: (theme: "dark" | "light") => void;
   toggleTheme: () => void;
+  setWallpaper: (wallpaper: string) => void;
+  setAccentColor: (accent: string) => void;
+  addCustomWallpaper: (dataUrl: string) => void;
   finishBoot: () => void;
   reboot: () => void;
   lockScreen: () => void;
@@ -51,6 +57,9 @@ export const useSystemStore = create<SystemStoreState>((set, get) => ({
   volume: 75,
   wifiConnected: true,
   bluetoothConnected: true,
+  wallpaper: "noble-dynamic",
+  accentColor: "#E95420",
+  customWallpapers: [],
   notifications: [
     {
       id: "notif-1",
@@ -72,6 +81,31 @@ export const useSystemStore = create<SystemStoreState>((set, get) => ({
   toggleTheme: () => {
     const next = get().theme === "dark" ? "light" : "dark";
     get().setTheme(next);
+  },
+
+  setWallpaper: (wallpaper) => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("ubuntu_wallpaper", wallpaper);
+    }
+    set({ wallpaper });
+  },
+
+  setAccentColor: (accentColor) => {
+    if (typeof window !== "undefined") {
+      document.documentElement.style.setProperty("--ubuntu-orange", accentColor);
+      localStorage.setItem("ubuntu_accent", accentColor);
+    }
+    set({ accentColor });
+  },
+
+  addCustomWallpaper: (dataUrl) => {
+    const next = [dataUrl, ...get().customWallpapers];
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem("ubuntu_custom_wallpapers", JSON.stringify(next.slice(0, 5)));
+      } catch {}
+    }
+    set({ customWallpapers: next, wallpaper: dataUrl });
   },
 
   finishBoot: () => {

@@ -27,7 +27,7 @@ export function Desktop() {
 
   const isBooting = useSystemStore((state) => state.isBooting);
 
-  // Check initial session boot and welcome status
+  // Check initial session boot, welcome status, and appearance preferences
   React.useEffect(() => {
     const hasBooted = sessionStorage.getItem("ubuntu_booted");
     if (!hasBooted) {
@@ -37,6 +37,23 @@ export function Desktop() {
       if (!welcomeDismissed) {
         useSystemStore.setState({ isWelcomeOpen: true });
       }
+    }
+
+    const savedWallpaper = localStorage.getItem("ubuntu_wallpaper");
+    if (savedWallpaper) {
+      useSystemStore.setState({ wallpaper: savedWallpaper });
+    }
+
+    const savedAccent = localStorage.getItem("ubuntu_accent");
+    if (savedAccent) {
+      useSystemStore.getState().setAccentColor(savedAccent);
+    }
+
+    const savedCustom = localStorage.getItem("ubuntu_custom_wallpapers");
+    if (savedCustom) {
+      try {
+        useSystemStore.setState({ customWallpapers: JSON.parse(savedCustom) });
+      } catch {}
     }
   }, []);
 
