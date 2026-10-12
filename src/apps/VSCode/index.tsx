@@ -82,7 +82,7 @@ export default function VSCodeApp() {
     <div className="h-full w-full flex flex-col bg-[#1E1E1E] text-white font-mono text-xs select-none">
       <div className="flex-1 flex overflow-hidden">
         {/* Left Sidebar: Explorer */}
-        <div className="w-52 bg-[#181818] border-r border-white/10 flex flex-col shrink-0">
+        <div className="w-36 sm:w-52 bg-[#181818] border-r border-white/10 flex flex-col shrink-0">
           <div className="h-9 px-3 border-b border-white/5 flex items-center justify-between text-[11px] font-semibold tracking-wider uppercase text-zinc-400">
             <span>Explorer</span>
           </div>

@@ -56,7 +56,7 @@ export default function FilesApp() {
   return (
     <div className="h-full w-full flex bg-[#1E1E1E] text-white font-sans text-xs select-none">
       {/* Left Sidebar */}
-      <div className="w-48 bg-[#181818] border-r border-white/10 p-3 space-y-4 shrink-0">
+      <div className="w-36 sm:w-48 bg-[#181818] border-r border-white/10 p-3 space-y-4 shrink-0">
         <div className="space-y-1">
           <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500 px-2 block">
             Places

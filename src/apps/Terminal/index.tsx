@@ -141,6 +141,28 @@ export default function TerminalApp() {
             />
           </div>
 
+          {/* Quick Command Pills for Touch & Mobile Devices */}
+          <div className="flex items-center gap-1.5 pt-3 overflow-x-auto select-none border-t border-white/5">
+            {["help", "skills", "projects", "cat resume.md", "clear"].map((qCmd) => (
+              <button
+                key={qCmd}
+                type="button"
+                onClick={() => {
+                  if (qCmd === "clear") {
+                    setEntries([]);
+                    return;
+                  }
+                  const res = executeCommand(qCmd);
+                  setEntries((prev) => [...prev, { cmd: qCmd, output: res.output }]);
+                  setCommandHistory((prev) => [...prev, qCmd]);
+                }}
+                className="px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 text-[11px] text-zinc-400 hover:text-white border border-white/10 transition-colors whitespace-nowrap"
+              >
+                {qCmd}
+              </button>
+            ))}
+          </div>
+
           <div ref={bottomRef} />
         </div>
       </div>
