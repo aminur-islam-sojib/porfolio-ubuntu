@@ -35,3 +35,4 @@ export function getLayoutMode(width: number): LayoutMode {
   if (width < 1024) return "tablet";
   return "desktop";
 }
+

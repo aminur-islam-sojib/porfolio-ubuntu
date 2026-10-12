@@ -129,3 +129,4 @@ export function HomeGrid({ onOpenApp, openAppIds }: HomeGridProps) {
     </div>
   );
 }
+
