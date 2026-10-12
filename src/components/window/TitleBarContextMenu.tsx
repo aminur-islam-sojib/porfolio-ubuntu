@@ -105,3 +105,4 @@ export function TitleBarContextMenu({
     </div>
   );
 }
+
