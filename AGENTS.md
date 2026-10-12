@@ -38,7 +38,7 @@ docs/                  PRD.md, DESIGN.md, ROADMAP.md, PROMPTS.md
 - `pnpm lint` and `pnpm tsc --noEmit` — must pass with zero errors
 
 ## Non-negotiable rules
-1. **Read the matching skill in `.agents/skills/` before starting any task** (window-manager, ubuntu-design-system, shell-components, desktop-apps, mobile-tablet-shell, motion-performance, content-seo-a11y).
+1. **Read the matching skill in `.agent/skills/` before starting any task** (window-manager, ubuntu-design-system, shell-components, desktop-apps, mobile-tablet-shell, motion-performance, content-seo-a11y).
 2. **All visual values come from tokens** (`tokens.css`). No random hex codes or magic pixel values in components.
 3. **Animate only `transform` and `opacity`.** Never animate `top/left/width/height` during drag or open/close.
 4. **One source of truth for windows**: the Zustand store. Components never keep their own position/size/z-index state.
