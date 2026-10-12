@@ -1,0 +1,72 @@
+:root {
+  /* Ubuntu Brand Accents */
+  --ubuntu-orange: #e95420;
+  --ubuntu-orange-hover: #ff6d3b;
+  --ubuntu-orange-active: #d03f0d;
+  --ubuntu-aubergine-dark: #77216f;
+  --ubuntu-aubergine-mid: #5e2750;
+  --ubuntu-aubergine-deep: #2c001e;
+
+  /* Yaru Dark Shell (Default) */
+  --color-shell-bg: rgba(17, 17, 17, 0.95);
+  --color-dock-bg: rgba(16, 16, 16, 0.88);
+  --color-window-bg: #242424;
+  --color-window-header: #2e2e2e;
+  --color-window-header-inactive: #262626;
+  --color-card-bg: #303030;
+  --color-card-hover: #3a3a3a;
+  --color-card-active: #444444;
+  --color-border-subtle: rgba(255, 255, 255, 0.08);
+  --color-border-focus: #e95420;
+
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #b0b0b0;
+  --color-text-muted: #7a7a7a;
+
+  /* Terminal Colors */
+  --color-terminal-bg: #300a24;
+  --color-terminal-text: #47d472;
+
+  /* Status Colors */
+  --color-status-success: #38b44a;
+  --color-status-warning: #efb73e;
+  --color-status-danger: #df382c;
+  --color-status-info: #19b6ee;
+
+  /* Geometry & Dimensions */
+  --topbar-height: 30px;
+  --dock-width: 56px;
+  --titlebar-height: 40px;
+  --window-radius: 12px;
+  --control-radius: 6px;
+
+  /* Elevation Shadows */
+  --shadow-window: 0 14px 40px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-window-inactive: 0 6px 20px rgba(0, 0, 0, 0.35);
+  --shadow-popover: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-dock-tooltip: 0 4px 12px rgba(0, 0, 0, 0.4);
+
+  /* Motion Timing & Curves */
+  --duration-fast: 120ms;
+  --duration-normal: 200ms;
+  --duration-window: 300ms;
+  --ease-ubuntu: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-theme="light"] {
+  --color-shell-bg: rgba(240, 240, 240, 0.95);
+  --color-dock-bg: rgba(230, 230, 230, 0.88);
+  --color-window-bg: #fafafa;
+  --color-window-header: #ebebeb;
+  --color-window-header-inactive: #e0e0e0;
+  --color-card-bg: #f2f2f2;
+  --color-card-hover: #e8e8e8;
+  --color-card-active: #dedede;
+  --color-border-subtle: rgba(0, 0, 0, 0.1);
+  --color-border-focus: #e95420;
+
+  --color-text-primary: #111111;
+  --color-text-secondary: #4a4a4a;
+  --color-text-muted: #888888;
+}
+

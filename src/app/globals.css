@@ -1,26 +1,46 @@
 @import "tailwindcss";
+@import "../styles/tokens.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@theme {
+  --font-ubuntu: var(--font-ubuntu), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-ubuntu-mono: var(--font-ubuntu-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  --color-ubuntu-orange: var(--ubuntu-orange);
+  --color-ubuntu-orange-hover: var(--ubuntu-orange-hover);
+  --color-ubuntu-orange-active: var(--ubuntu-orange-active);
+  --color-ubuntu-aubergine-dark: var(--ubuntu-aubergine-dark);
+  --color-ubuntu-aubergine-mid: var(--ubuntu-aubergine-mid);
+  --color-ubuntu-aubergine-deep: var(--ubuntu-aubergine-deep);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-shell-bg: var(--color-shell-bg);
+  --color-dock-bg: var(--color-dock-bg);
+  --color-window-bg: var(--color-window-bg);
+  --color-window-header: var(--color-window-header);
+  --color-window-header-inactive: var(--color-window-header-inactive);
+  --color-card-bg: var(--color-card-bg);
+  --color-card-hover: var(--color-card-hover);
+  --color-card-active: var(--color-card-active);
+  --color-border-subtle: var(--color-border-subtle);
+  --color-border-focus: var(--color-border-focus);
+
+  --color-text-primary: var(--color-text-primary);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-text-muted: var(--color-text-muted);
+
+  --color-terminal-bg: var(--color-terminal-bg);
+  --color-terminal-text: var(--color-terminal-text);
+
+  --color-status-success: var(--color-status-success);
+  --color-status-warning: var(--color-status-warning);
+  --color-status-danger: var(--color-status-danger);
+  --color-status-info: var(--color-status-info);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-ubuntu), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: var(--color-text-primary);
+  background-color: #111111;
+  user-select: none;
+  -webkit-user-select: none;
+  overflow: hidden;
 }
