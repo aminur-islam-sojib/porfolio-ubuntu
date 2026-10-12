@@ -30,33 +30,33 @@ export function Dock({ onShowApplicationsClick }: DockProps) {
     <aside
       role="toolbar"
       aria-label="Ubuntu Dock"
-      className="fixed top-[var(--topbar-height)] left-0 bottom-0 w-[var(--dock-width)] bg-[#101010]/90 backdrop-blur-lg border-r border-white/5 z-[9990] flex flex-col items-center justify-between py-2 select-none"
+      className="fixed bottom-2.5 left-1/2 -translate-x-1/2 z-[9990] flex items-center gap-1.5 bg-[#101010]/85 backdrop-blur-2xl border border-white/10 rounded-2xl px-2.5 py-1.5 shadow-[0_16px_40px_rgba(0,0,0,0.65)] select-none"
     >
-      {/* Top / Pinned Apps */}
-      <div className="flex flex-col items-center gap-1.5 w-full">
+      {/* Pinned Applications */}
+      <div className="flex items-center gap-1.5">
         {pinnedApps.map((app: AppMetadata) => {
           const isRunning = activeAppIds.includes(app.id);
           const isFocused = focusedAppId === app.id;
 
           return (
-            <Tooltip key={app.id} content={app.title} position="right">
+            <Tooltip key={app.id} content={app.title} position="top">
               <button
                 type="button"
                 onClick={() => handleAppClick(app.id)}
                 aria-label={`Launch ${app.title}`}
                 className={cn(
-                  "relative w-12 h-12 rounded-[10px] flex items-center justify-center transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ubuntu-orange)] group",
+                  "relative w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ubuntu-orange)] group",
                   isFocused
                     ? "bg-white/15 shadow-inner"
                     : "hover:bg-white/10 active:bg-white/20"
                 )}
               >
-                {/* Ubuntu Running Indicator (Orange dot / pill on the left) */}
+                {/* Ubuntu Running Indicator (Orange dot / pill beneath icon) */}
                 {isRunning && (
                   <span
                     className={cn(
-                      "absolute -left-1 w-1.5 h-1.5 rounded-full bg-[var(--ubuntu-orange)] transition-all",
-                      isFocused ? "h-3 -left-1 rounded-r-full" : ""
+                      "absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-[var(--ubuntu-orange)] shadow-[0_0_8px_var(--ubuntu-orange)] transition-all",
+                      isFocused ? "w-3 h-1.5" : ""
                     )}
                   />
                 )}
@@ -72,16 +72,19 @@ export function Dock({ onShowApplicationsClick }: DockProps) {
         })}
       </div>
 
-      {/* Bottom: Trash & Show Applications */}
-      <div className="flex flex-col items-center gap-1.5 w-full pt-2 border-t border-white/10">
+      {/* Subtle Divider */}
+      <div className="w-[1px] h-7 bg-white/15 mx-1 shrink-0" />
+
+      {/* Utilities: Trash & Show Applications */}
+      <div className="flex items-center gap-1.5">
         {trashApp && (
-          <Tooltip content={trashApp.title} position="right">
+          <Tooltip content={trashApp.title} position="top">
             <button
               type="button"
               onClick={() => handleAppClick(trashApp.id)}
               aria-label="Open Trash"
               className={cn(
-                "relative w-12 h-12 rounded-[10px] flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ubuntu-orange)] group",
+                "relative w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ubuntu-orange)] group",
                 focusedAppId === "trash"
                   ? "bg-white/15 shadow-inner"
                   : "hover:bg-white/10 active:bg-white/20"
@@ -90,8 +93,8 @@ export function Dock({ onShowApplicationsClick }: DockProps) {
               {activeAppIds.includes("trash") && (
                 <span
                   className={cn(
-                    "absolute -left-1 w-1.5 h-1.5 rounded-full bg-[var(--ubuntu-orange)] transition-all",
-                    focusedAppId === "trash" ? "h-3 -left-1 rounded-r-full" : ""
+                    "absolute -bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-[var(--ubuntu-orange)] shadow-[0_0_8px_var(--ubuntu-orange)] transition-all",
+                    focusedAppId === "trash" ? "w-3 h-1.5" : ""
                   )}
                 />
               )}
@@ -104,7 +107,7 @@ export function Dock({ onShowApplicationsClick }: DockProps) {
           </Tooltip>
         )}
 
-        <Tooltip content="Show Applications" position="right">
+        <Tooltip content="Show Applications" position="top">
           <button
             type="button"
             onClick={() => {
@@ -115,7 +118,7 @@ export function Dock({ onShowApplicationsClick }: DockProps) {
               }
             }}
             aria-label="Show Applications"
-            className="w-12 h-12 rounded-[10px] flex items-center justify-center hover:bg-white/10 active:bg-white/20 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ubuntu-orange)] group"
+            className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center hover:bg-white/10 active:bg-white/20 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ubuntu-orange)] group"
           >
             <AppIcon
               id="apps"

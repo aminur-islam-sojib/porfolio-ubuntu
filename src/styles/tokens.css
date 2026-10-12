@@ -36,6 +36,7 @@
   /* Geometry & Dimensions */
   --topbar-height: 30px;
   --dock-width: 56px;
+  --dock-height: 64px;
   --titlebar-height: 40px;
   --window-radius: 12px;
   --control-radius: 6px;

@@ -1,5 +1,6 @@
 export const TOPBAR_HEIGHT = 30;
 export const DOCK_WIDTH = 56;
+export const DOCK_HEIGHT = 68;
 export const TITLEBAR_HEIGHT = 40;
 
 export interface DesktopBounds {
@@ -12,18 +13,18 @@ export interface DesktopBounds {
 export function getDesktopBounds(): DesktopBounds {
   if (typeof window === "undefined") {
     return {
-      x: DOCK_WIDTH,
+      x: 0,
       y: TOPBAR_HEIGHT,
       width: 1200,
-      height: 750,
+      height: 720,
     };
   }
 
-  const width = Math.max(360, window.innerWidth - DOCK_WIDTH);
-  const height = Math.max(300, window.innerHeight - TOPBAR_HEIGHT);
+  const width = Math.max(360, window.innerWidth);
+  const height = Math.max(300, window.innerHeight - TOPBAR_HEIGHT - DOCK_HEIGHT);
 
   return {
-    x: DOCK_WIDTH,
+    x: 0,
     y: TOPBAR_HEIGHT,
     width,
     height,

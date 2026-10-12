@@ -108,7 +108,7 @@ export function DesktopIcons() {
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
-      className="absolute inset-0 pl-[var(--dock-width)] pt-[var(--topbar-height)] p-6 select-none pointer-events-auto"
+      className="absolute inset-0 pt-[calc(var(--topbar-height)+16px)] pb-24 px-6 select-none pointer-events-auto"
     >
       {/* Desktop Icons Grid */}
       <div className="grid grid-flow-col grid-rows-4 gap-4 w-fit pt-2 z-10 relative">
