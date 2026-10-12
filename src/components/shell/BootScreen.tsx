@@ -89,3 +89,4 @@ export function BootScreen({ onComplete }: BootScreenProps) {
     </div>
   );
 }
+
