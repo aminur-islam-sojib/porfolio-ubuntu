@@ -2,6 +2,7 @@ import { profileData } from "@/data/profile";
 import { projectsData } from "@/data/projects";
 import { skillsData } from "@/data/skills";
 import { useSystemStore } from "@/store/system";
+import { useWindowStore } from "@/store/windows";
 
 export const AVAILABLE_COMMANDS = [
   "help",
@@ -19,6 +20,12 @@ export const AVAILABLE_COMMANDS = [
   "history",
   "lock",
   "reboot",
+  "cowsay",
+  "sl",
+  "matrix",
+  "fortune",
+  "theme",
+  "exit",
 ];
 
 const NEOFETCH_ART = `
@@ -63,6 +70,12 @@ export function executeCommand(rawCommand: string): { output: string; shouldClea
           "  clear             Clear the terminal display",
           "  lock              Lock desktop session (GDM lock screen)",
           "  reboot            Restart system and replay Plymouth boot",
+          "  theme <dark|light> Switch between dark and light themes",
+          "  cowsay <text>     Cow speech bubble message",
+          "  sl                Steam locomotive animation",
+          "  matrix            Digital matrix code stream",
+          "  fortune           Engineering fortune quote",
+          "  exit              Close the terminal window",
           "  sudo <cmd>        Execute command with elevated privileges",
         ].join("\n"),
       };
@@ -161,6 +174,71 @@ export function executeCommand(rawCommand: string): { output: string; shouldClea
     case "reboot":
       useSystemStore.getState().reboot();
       return { output: "Restarting Ubuntu desktop..." };
+
+    case "cowsay": {
+      const msg = args.join(" ") || `Hire ${profileData.name}! Top-tier Full-Stack Engineer.`;
+      const border = "-".repeat(msg.length + 4);
+      return {
+        output: [
+          `  ${border}`,
+          `<  ${msg}  >`,
+          `  ${border}`,
+          `        \\   ^__^`,
+          `         \\  (oo)\\_______`,
+          `            (__)\\       )\\/\\`,
+          `                ||----w |`,
+          `                ||     ||`,
+        ].join("\n"),
+      };
+    }
+
+    case "sl":
+      return {
+        output: [
+          "      ====        ________                ___________",
+          "  _D _|  |_______/        \\__I_I_____===__|_________|",
+          "   |(_)---  |   H\\________/ _____ |   | |   |       |",
+          "   /     |  |   H  |  |     |   | |   | |   |       |",
+          "  |      |  |   H  |__--------------------|_______|",
+          "  | ________|___H__/__|_____/[][]~\\_______|      |",
+          "  |/ |   |_____ _____ _____       _____   | ____ |",
+          " Choo Choo! (Did you mean 'ls'?)",
+        ].join("\n"),
+      };
+
+    case "matrix":
+      return {
+        output: [
+          "01010100 01101000 01100101 00100000 01001101 01100001 01110100 01110010 01101001 01111000",
+          " Wake up, Neo... The Matrix has you.",
+          " Follow the white rabbit: https://github.com/sojib-ahmed",
+          " Knock, knock.",
+        ].join("\n"),
+      };
+
+    case "fortune": {
+      const quotes = [
+        `"Simplicity is prerequisite for reliability." — Edsger W. Dijkstra`,
+        `"First, solve the problem. Then, write the code." — John Johnson`,
+        `"Make it work, make it right, make it fast." — Kent Beck`,
+        `"Good code is its own best documentation." — Steve McConnell`,
+      ];
+      return { output: quotes[Math.floor(Math.random() * quotes.length)] };
+    }
+
+    case "theme": {
+      const target = args[0]?.toLowerCase();
+      if (target === "light" || target === "dark") {
+        useSystemStore.getState().setTheme(target);
+        return { output: `Theme switched to ${target} mode.` };
+      }
+      useSystemStore.getState().toggleTheme();
+      return { output: "System theme toggled." };
+    }
+
+    case "exit":
+      useWindowStore.getState().closeWindow("terminal");
+      return { output: "logout" };
 
     default:
       return {
