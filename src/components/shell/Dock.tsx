@@ -4,25 +4,26 @@ import * as React from "react";
 import { APP_REGISTRY, AppMetadata } from "@/apps/registry";
 import { AppIcon } from "@/components/shell/AppIcon";
 import { Tooltip } from "@/components/ui/Tooltip";
+import { useWindowStore } from "@/store/windows";
 import { cn } from "@/lib/cn";
 
 export interface DockProps {
-  activeAppIds?: string[]; // IDs of apps currently open/running
-  focusedAppId?: string | null; // ID of app currently focused
-  onAppClick?: (appId: string) => void;
   onShowApplicationsClick?: () => void;
 }
 
-export function Dock({
-  activeAppIds = ["about", "terminal"], // defaults for static shell preview
-  focusedAppId = "about",
-  onAppClick,
-  onShowApplicationsClick,
-}: DockProps) {
+export function Dock({ onShowApplicationsClick }: DockProps) {
+  // Fine-grained subscriptions with stable array reference
+  const activeAppIds = useWindowStore((state) => state.openWindowIds);
+  const focusedAppId = useWindowStore((state) => state.activeId);
+
   const pinnedApps = Object.values(APP_REGISTRY).filter(
     (app) => app.isPinned && app.id !== "trash"
   );
   const trashApp = APP_REGISTRY.trash;
+
+  const handleAppClick = (appId: string) => {
+    useWindowStore.getState().toggleWindow(appId);
+  };
 
   return (
     <aside
@@ -40,7 +41,7 @@ export function Dock({
             <Tooltip key={app.id} content={app.title} position="right">
               <button
                 type="button"
-                onClick={() => onAppClick?.(app.id)}
+                onClick={() => handleAppClick(app.id)}
                 aria-label={`Launch ${app.title}`}
                 className={cn(
                   "relative w-12 h-12 rounded-[10px] flex items-center justify-center transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ubuntu-orange)] group",
@@ -49,12 +50,12 @@ export function Dock({
                     : "hover:bg-white/10 active:bg-white/20"
                 )}
               >
-                {/* Ubuntu Running Indicator (Orange dot on the left) */}
+                {/* Ubuntu Running Indicator (Orange dot / pill on the left) */}
                 {isRunning && (
                   <span
                     className={cn(
                       "absolute -left-1 w-1.5 h-1.5 rounded-full bg-[var(--ubuntu-orange)] transition-all",
-                      isFocused ? "h-3 -left-1" : ""
+                      isFocused ? "h-3 -left-1 rounded-r-full" : ""
                     )}
                   />
                 )}
@@ -76,10 +77,23 @@ export function Dock({
           <Tooltip content={trashApp.title} position="right">
             <button
               type="button"
-              onClick={() => onAppClick?.(trashApp.id)}
+              onClick={() => handleAppClick(trashApp.id)}
               aria-label="Open Trash"
-              className="relative w-12 h-12 rounded-[10px] flex items-center justify-center hover:bg-white/10 active:bg-white/20 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ubuntu-orange)] group"
+              className={cn(
+                "relative w-12 h-12 rounded-[10px] flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ubuntu-orange)] group",
+                focusedAppId === "trash"
+                  ? "bg-white/15 shadow-inner"
+                  : "hover:bg-white/10 active:bg-white/20"
+              )}
             >
+              {activeAppIds.includes("trash") && (
+                <span
+                  className={cn(
+                    "absolute -left-1 w-1.5 h-1.5 rounded-full bg-[var(--ubuntu-orange)] transition-all",
+                    focusedAppId === "trash" ? "h-3 -left-1 rounded-r-full" : ""
+                  )}
+                />
+              )}
               <AppIcon
                 id="trash"
                 size={38}
@@ -107,4 +121,3 @@ export function Dock({
     </aside>
   );
 }
-

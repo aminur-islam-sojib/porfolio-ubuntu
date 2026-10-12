@@ -1,40 +1,43 @@
+import dynamic from "next/dynamic";
 import { ComponentType } from "react";
 
 export interface AppMetadata {
   id: string;
   title: string;
-  icon: string; // Icon identifier or path
+  icon: string;
   category: "system" | "portfolio" | "tools";
   defaultWidth: number;
   defaultHeight: number;
   minWidth: number;
   minHeight: number;
-  isPinned: boolean; // Pinned to the Ubuntu Dock
-  component?: ComponentType<unknown>;
+  isPinned: boolean;
+  component: ComponentType<unknown>;
 }
 
 export const APP_REGISTRY: Record<string, AppMetadata> = {
   about: {
     id: "about",
     title: "About Me",
-    icon: "info",
+    icon: "about",
     category: "portfolio",
     defaultWidth: 720,
     defaultHeight: 520,
     minWidth: 480,
     minHeight: 380,
     isPinned: true,
+    component: dynamic(() => import("@/apps/About")),
   },
   projects: {
     id: "projects",
     title: "Projects",
-    icon: "folder-git",
+    icon: "projects",
     category: "portfolio",
     defaultWidth: 840,
     defaultHeight: 600,
     minWidth: 520,
     minHeight: 400,
     isPinned: true,
+    component: dynamic(() => import("@/apps/Projects")),
   },
   terminal: {
     id: "terminal",
@@ -46,39 +49,43 @@ export const APP_REGISTRY: Record<string, AppMetadata> = {
     minWidth: 420,
     minHeight: 300,
     isPinned: true,
+    component: dynamic(() => import("@/apps/Terminal")),
   },
   files: {
     id: "files",
     title: "Files",
-    icon: "folder",
+    icon: "files",
     category: "system",
     defaultWidth: 780,
     defaultHeight: 540,
     minWidth: 480,
     minHeight: 360,
     isPinned: true,
+    component: dynamic(() => import("@/apps/Files")),
   },
   skills: {
     id: "skills",
     title: "Skills & Tech",
-    icon: "cpu",
+    icon: "skills",
     category: "portfolio",
     defaultWidth: 720,
     defaultHeight: 520,
     minWidth: 460,
     minHeight: 380,
     isPinned: true,
+    component: dynamic(() => import("@/apps/Skills")),
   },
   resume: {
     id: "resume",
     title: "Resume",
-    icon: "file-text",
+    icon: "resume",
     category: "portfolio",
     defaultWidth: 760,
     defaultHeight: 640,
     minWidth: 500,
     minHeight: 420,
     isPinned: true,
+    component: dynamic(() => import("@/apps/Resume")),
   },
   mail: {
     id: "mail",
@@ -86,10 +93,11 @@ export const APP_REGISTRY: Record<string, AppMetadata> = {
     icon: "mail",
     category: "tools",
     defaultWidth: 680,
-    defaultHeight: 500,
+    defaultHeight: 520,
     minWidth: 440,
     minHeight: 360,
     isPinned: true,
+    component: dynamic(() => import("@/apps/Mail")),
   },
   settings: {
     id: "settings",
@@ -101,6 +109,7 @@ export const APP_REGISTRY: Record<string, AppMetadata> = {
     minWidth: 440,
     minHeight: 360,
     isPinned: false,
+    component: dynamic(() => import("@/apps/Settings")),
   },
   trash: {
     id: "trash",
@@ -112,6 +121,6 @@ export const APP_REGISTRY: Record<string, AppMetadata> = {
     minWidth: 380,
     minHeight: 280,
     isPinned: true,
+    component: dynamic(() => import("@/apps/Trash")),
   },
 };
-
