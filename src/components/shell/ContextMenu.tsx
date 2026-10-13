@@ -14,6 +14,7 @@ import {
   Maximize2,
   Minimize2,
   Type,
+  Cat,
 } from "lucide-react";
 import { useIsFullscreen, toggleFullscreen } from "@/lib/fullscreen";
 
@@ -27,6 +28,7 @@ export function ContextMenu({ x, y, onClose }: ContextMenuProps) {
   const menuRef = React.useRef<HTMLDivElement>(null);
   const theme = useSystemStore((state) => state.theme);
   const font = useSystemStore((state) => state.font);
+  const onekoEnabled = useSystemStore((state) => state.onekoEnabled);
   const isFullscreen = useIsFullscreen();
 
   React.useEffect(() => {
@@ -176,6 +178,33 @@ export function ContextMenu({ x, y, onClose }: ContextMenuProps) {
         </span>
         <span className="text-[10px] text-[var(--color-text-muted)]">
           {SYSTEM_FONTS.find((f) => f.id === font)?.name ?? "Ubuntu"}
+        </span>
+      </button>
+
+      <button
+        type="button"
+        role="menuitem"
+        onClick={() =>
+          handleAction(() => {
+            const current = useSystemStore.getState().onekoEnabled;
+            useSystemStore.getState().toggleOneko();
+            const willBeActive = !current;
+            useSystemStore.getState().addNotification({
+              title: willBeActive ? "oneko: Desktop Kitten Spawned! 🐾" : "oneko: Kitten Resting 💤",
+              message: willBeActive
+                ? "The classic Linux desktop cat is now chasing your mouse cursor!"
+                : "The desktop kitten curled up to sleep.",
+            });
+          })
+        }
+        className="w-full px-3.5 py-1.5 flex items-center justify-between text-left hover:bg-[var(--ubuntu-orange)] hover:text-white transition-colors"
+      >
+        <span className="flex items-center gap-2.5">
+          <Cat className="w-4 h-4 text-amber-300" />
+          <span>Desktop Cat (oneko)</span>
+        </span>
+        <span className="text-[10px] text-[var(--color-text-muted)]">
+          {onekoEnabled ? "Active" : "Off"}
         </span>
       </button>
 

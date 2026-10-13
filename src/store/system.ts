@@ -78,6 +78,7 @@ interface SystemStoreState {
   wallpaper: string;
   accentColor: string;
   customWallpapers: string[];
+  onekoEnabled: boolean;
 
   // Actions
   setTheme: (theme: "dark" | "light") => void;
@@ -86,6 +87,8 @@ interface SystemStoreState {
   setWallpaper: (wallpaper: string) => void;
   setAccentColor: (accent: string) => void;
   addCustomWallpaper: (dataUrl: string) => void;
+  toggleOneko: () => void;
+  setOneko: (enabled: boolean) => void;
   finishBoot: () => void;
   reboot: () => void;
   lockScreen: () => void;
@@ -117,6 +120,7 @@ export const useSystemStore = create<SystemStoreState>((set, get) => ({
   wallpaper: "noble-dynamic",
   accentColor: "#E95420",
   customWallpapers: [],
+  onekoEnabled: false,
   notifications: [
     {
       id: "notif-1",
@@ -174,6 +178,25 @@ export const useSystemStore = create<SystemStoreState>((set, get) => ({
       } catch {}
     }
     set({ customWallpapers: next, wallpaper: dataUrl });
+  },
+
+  toggleOneko: () => {
+    const next = !get().onekoEnabled;
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem("ubuntu_oneko", String(next));
+      } catch {}
+    }
+    set({ onekoEnabled: next });
+  },
+
+  setOneko: (enabled) => {
+    if (typeof window !== "undefined") {
+      try {
+        localStorage.setItem("ubuntu_oneko", String(enabled));
+      } catch {}
+    }
+    set({ onekoEnabled: enabled });
   },
 
   finishBoot: () => {

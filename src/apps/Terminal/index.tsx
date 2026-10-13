@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { executeCommand, autoCompleteCommand } from "@/apps/Terminal/commands";
+import { formatAnsiToReact } from "@/apps/Terminal/ansi";
 
 interface HistoryEntry {
   cmd: string;
@@ -116,7 +117,7 @@ export default function TerminalApp() {
               )}
               {item.output && (
                 <pre className="text-[#47D472] whitespace-pre-wrap font-mono leading-relaxed pl-1">
-                  {item.output}
+                  {formatAnsiToReact(item.output)}
                 </pre>
               )}
             </div>
@@ -143,7 +144,18 @@ export default function TerminalApp() {
 
           {/* Quick Command Pills for Touch & Mobile Devices */}
           <div className="flex items-center gap-1.5 pt-3 overflow-x-auto select-none border-t border-white/5">
-            {["neofetch", "skills", "projects", "cat resume.md", "cowsay", "clear"].map((qCmd) => (
+            {[
+              "neofetch",
+              "catsay",
+              "pet",
+              "catfacts",
+              "oneko",
+              "lolcat catsay",
+              "skills",
+              "projects",
+              "cowsay",
+              "clear",
+            ].map((qCmd) => (
               <button
                 key={qCmd}
                 type="button"
