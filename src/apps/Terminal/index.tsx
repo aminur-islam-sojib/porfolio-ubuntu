@@ -106,8 +106,8 @@ export default function TerminalApp() {
     setEntries((prev) => [
       ...prev,
       {
-        cmd: "exit game",
-        output: `[SESSION: Arcade Stopped]\nMission finished! Final Score: ${score} pts.\nType 'game' or 'shooter' to start another round anytime.`,
+        cmd: "exit invaders",
+        output: `[SESSION: Game Over]\nTerminal Invaders terminated. Final Score: ${score} pts.\nType 'game' to play again anytime!`,
       },
     ]);
   };

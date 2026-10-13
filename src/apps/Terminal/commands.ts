@@ -237,7 +237,7 @@ function executeSingleCommand(rawCommand: string): CommandResult {
       return {
         output: [
           "Available terminal commands:",
-          "  game / shooter    Retro ASCII Space Invaders arcade shooter game (Alien Invaders)",
+          "  game / shooter    Retro ASCII Space Invaders arcade shooter (Alien Invaders)",
           "  neofetch          Display system specifications and Ubuntu banner",
           "  skills            List technical skills by engineering domain",
           "  projects          View portfolio projects with stack and links",

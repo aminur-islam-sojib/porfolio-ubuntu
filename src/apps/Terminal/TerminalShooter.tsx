@@ -64,7 +64,7 @@ export function TerminalShooter({ onExit }: TerminalShooterProps) {
   });
   const [score, setScore] = React.useState<number>(0);
   const [gameState, setGameState] = React.useState<"start" | "playing" | "paused" | "gameover" | "victory">("start");
-  const [isMuted, setIsMuted] = React.useState<boolean>(false);
+  const [isMuted, setIsMuted] = React.useState<boolean>(() => soundFx.getMuted());
 
   // Mutable game state ref to avoid React state lag during 60fps loop
   const gameRef = React.useRef({
@@ -279,7 +279,10 @@ export function TerminalShooter({ onExit }: TerminalShooterProps) {
       }
       if (e.key === " " || e.key === "Spacebar" || e.key === "ArrowUp" || e.key === "w" || e.key === "W") {
         e.preventDefault();
-        if (g.state === "start" || g.state === "gameover" || g.state === "victory") {
+        if (g.state === "paused") {
+          g.state = "playing";
+          setGameState("playing");
+        } else if (g.state === "start" || g.state === "gameover" || g.state === "victory") {
           startGame();
         } else if (g.state === "playing") {
           fireBullet();
@@ -932,14 +935,26 @@ export function TerminalShooter({ onExit }: TerminalShooterProps) {
             <span>START MISSION</span>
           </button>
         ) : gameState === "gameover" ? (
-          <button
-            type="button"
-            onClick={startGame}
-            className="px-4 py-2 rounded-lg bg-emerald-600 text-white font-bold text-xs flex items-center gap-1.5 shadow-md active:scale-95 transition-transform"
-          >
-            <RotateCcw className="w-3.5 h-3.5" />
-            <span>PLAY AGAIN</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={startGame}
+              className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-md active:scale-95 transition-transform"
+              title="Play Again (Space)"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span>PLAY AGAIN</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => onExit(score)}
+              className="px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-xs flex items-center gap-1.5 shadow-md active:scale-95 transition-transform"
+              title="Quit to Terminal Bash (Q)"
+            >
+              <X className="w-3.5 h-3.5" />
+              <span>QUIT (BASH)</span>
+            </button>
+          </div>
         ) : (
           <div className="hidden sm:block text-[11px] text-zinc-400">
             [Mouse / A / D] Move • [Click / SPACE] Fire • [P] Pause
