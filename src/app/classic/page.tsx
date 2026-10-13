@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Metadata } from "next";
 import {
   ExternalLink,
@@ -11,11 +12,14 @@ import {
   Cpu,
   ArrowRight,
   ShieldCheck,
+  Download,
+  GraduationCap,
+  Phone,
 } from "lucide-react";
 import { profileData } from "@/data/profile";
 import { projectsData } from "@/data/projects";
 import { skillsData } from "@/data/skills";
-import { experienceData } from "@/data/experience";
+import { experienceData, educationData } from "@/data/experience";
 
 export const metadata: Metadata = {
   title: "Classic View — Resume & Portfolio",
@@ -30,7 +34,7 @@ export default function ClassicPage() {
         aria-label="OS Switcher Banner"
         className="bg-gradient-to-r from-[#2C001E] via-[#77216F] to-[#E95420] text-white px-4 py-2.5 text-center text-xs sm:text-sm font-medium flex items-center justify-center gap-2"
       >
-        <span>Looking for the interactive experience?</span>
+        <span>Looking for the interactive desktop experience?</span>
         <Link
           href="/"
           className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-black/30 hover:bg-black/50 text-white font-semibold transition-colors underline-offset-4 hover:underline"
@@ -54,7 +58,16 @@ export default function ClassicPage() {
             <a href="#projects" className="hover:text-white transition-colors">Projects</a>
             <a href="#skills" className="hover:text-white transition-colors">Skills</a>
             <a href="#experience" className="hover:text-white transition-colors">Experience</a>
+            <a href="#education" className="hover:text-white transition-colors">Education</a>
             <a href="#contact" className="hover:text-white transition-colors">Contact</a>
+            <a
+              href={profileData.resumeUrl}
+              download="Sojib_Ahmed_Resume.pdf"
+              className="hover:text-[var(--ubuntu-orange)] transition-colors flex items-center gap-1"
+            >
+              <Download className="w-3 h-3" />
+              <span>Resume</span>
+            </a>
             <Link
               href="/"
               className="px-3.5 py-1.5 rounded-lg bg-[var(--ubuntu-orange)] hover:bg-[#ff6d38] text-white text-xs font-semibold transition-all shadow-sm flex items-center gap-1.5"
@@ -74,16 +87,29 @@ export default function ClassicPage() {
             <span>Recruiter-Optimized Classic Portfolio</span>
           </div>
 
-          <div className="space-y-3">
-            <h1 id="hero-heading" className="text-4xl sm:text-5xl font-extrabold text-white tracking-tight">
-              {profileData.name}
-            </h1>
-            <p className="text-xl sm:text-2xl font-medium text-[var(--ubuntu-orange)]">
-              {profileData.title}
-            </p>
-            <p className="text-base text-zinc-300 max-w-2xl leading-relaxed">
-              {profileData.subtitle}
-            </p>
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="space-y-3 flex-1">
+              <h1 id="hero-heading" className="text-4xl sm:text-5xl font-extrabold text-white tracking-tight">
+                {profileData.name}
+              </h1>
+              <p className="text-xl sm:text-2xl font-medium text-[var(--ubuntu-orange)]">
+                {profileData.title}
+              </p>
+              <p className="text-base text-zinc-300 max-w-2xl leading-relaxed">
+                {profileData.subtitle}
+              </p>
+            </div>
+
+            <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-2xl overflow-hidden border-2 border-white/15 shadow-2xl shrink-0 bg-[#2C001E]">
+              <Image
+                src={profileData.avatarUrl}
+                alt={profileData.name}
+                fill
+                sizes="128px"
+                className="object-cover"
+                priority
+              />
+            </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-4 text-xs text-zinc-400 pt-2">
@@ -98,6 +124,10 @@ export default function ClassicPage() {
               <Mail className="w-4 h-4 text-zinc-400" />
               <span>{profileData.email}</span>
             </a>
+            <span className="flex items-center gap-1.5">
+              <Phone className="w-4 h-4 text-zinc-400" />
+              <span>{profileData.phone}</span>
+            </span>
             <a
               href={profileData.socials.github}
               target="_blank"
@@ -118,10 +148,14 @@ export default function ClassicPage() {
               <ArrowRight className="w-4 h-4" />
             </a>
             <a
-              href="#contact"
-              className="px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-semibold transition-colors"
+              href={profileData.resumeUrl}
+              download="Sojib_Ahmed_Resume.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white text-xs font-semibold transition-colors flex items-center gap-2"
             >
-              Contact Me
+              <Download className="w-4 h-4" />
+              <span>Download CV (PDF)</span>
             </a>
             <Link
               href="/"
@@ -149,9 +183,21 @@ export default function ClassicPage() {
             {projectsData.map((project) => (
               <article
                 key={project.id}
-                className="p-6 rounded-2xl bg-[#1A1A1A] border border-white/10 hover:border-white/20 transition-all flex flex-col justify-between space-y-4"
+                className="p-6 rounded-2xl bg-[#1A1A1A] border border-white/10 hover:border-white/20 transition-all flex flex-col justify-between space-y-4 overflow-hidden"
               >
                 <div className="space-y-3">
+                  {project.thumbnailUrl && (
+                    <div className="relative w-full h-44 rounded-xl overflow-hidden bg-black/40 border border-white/5">
+                      <Image
+                        src={project.thumbnailUrl}
+                        alt={project.title}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 500px"
+                        className="object-cover"
+                      />
+                    </div>
+                  )}
+
                   <div className="flex items-center justify-between">
                     <span className="px-2.5 py-0.5 rounded-full bg-[var(--ubuntu-orange)]/10 text-[var(--ubuntu-orange)] text-[11px] font-semibold uppercase tracking-wider">
                       {project.category}
@@ -277,7 +323,7 @@ export default function ClassicPage() {
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                   <div>
                     <h3 className="text-base font-bold text-white">{exp.role}</h3>
-                    <p className="text-xs text-[var(--ubuntu-orange)] font-medium">{exp.company}</p>
+                    <p className="text-xs text-[var(--ubuntu-orange)] font-medium">{exp.company} — {exp.location}</p>
                   </div>
                   <span className="text-xs text-zinc-400 font-mono">{exp.period}</span>
                 </div>
@@ -305,6 +351,30 @@ export default function ClassicPage() {
           </div>
         </section>
 
+        {/* Education Section */}
+        <section id="education" aria-labelledby="edu-heading" className="space-y-8 scroll-mt-24">
+          <div className="flex items-center gap-2.5 border-b border-white/10 pb-4">
+            <GraduationCap className="w-5 h-5 text-emerald-400" />
+            <h2 id="edu-heading" className="text-2xl font-bold text-white tracking-tight">
+              Education & Academic Background
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            {educationData.map((edu) => (
+              <div
+                key={edu.id}
+                className="p-5 rounded-2xl bg-[#1A1A1A] border border-white/10 space-y-2"
+              >
+                <span className="text-[10px] font-mono text-zinc-400 block">{edu.period}</span>
+                <h3 className="font-bold text-white text-sm">{edu.degree}</h3>
+                <p className="text-xs text-[var(--ubuntu-orange)] font-medium">{edu.institution}</p>
+                <p className="text-xs text-zinc-400">{edu.location} • {edu.field}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
         {/* Contact Section */}
         <section id="contact" aria-labelledby="contact-heading" className="space-y-8 scroll-mt-24 pb-12">
           <div className="flex items-center gap-2.5 border-b border-white/10 pb-4">
@@ -317,7 +387,7 @@ export default function ClassicPage() {
           <div className="p-8 rounded-2xl bg-gradient-to-br from-[#1E1E1E] to-[#141414] border border-white/10 space-y-6 text-center max-w-2xl mx-auto">
             <h3 className="text-xl font-bold text-white">Let&apos;s build something exceptional together</h3>
             <p className="text-xs text-zinc-300 leading-relaxed">
-              Available for full-time software engineering roles, technical consulting, and contract projects.
+              Available for fullstack web development roles, freelance collaborations, and engineering opportunities.
             </p>
 
             <div className="flex flex-wrap items-center justify-center gap-4">

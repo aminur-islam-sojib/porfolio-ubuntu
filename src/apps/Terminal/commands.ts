@@ -36,11 +36,11 @@ const NEOFETCH_ART = `
  |   /-------\\   |   Host: Developer Portfolio Engine
  |  /         \\  |   Kernel: Linux 6.8.0-generic x86_64
   \\ \\---------/ /    Uptime: 24/7 Available for hire
-   -\\         /-     Packages: Next.js 16, React 19, Zustand, Tailwind
+   -\\         /-     Packages: Next.js, React, Node.js, MongoDB
      --\\   /--       Shell: bash 5.2.21
         ---          Terminal: gnome-terminal
-                     CPU: Full-Stack Engine (React + Node.js)
-                     Memory: High Capacity / Unlimited Curiosity
+                     CPU: Fullstack Engine (Next.js + Node.js + MongoDB)
+                     Memory: MERN Stack / Continuous Innovation
 `;
 
 export function executeCommand(rawCommand: string): { output: string; shouldClear?: boolean } {
@@ -122,12 +122,13 @@ export function executeCommand(rawCommand: string): { output: string; shouldClea
             `# ${profileData.name} — Resume Summary`,
             `Role: ${profileData.title}`,
             `Location: ${profileData.location}`,
-            `Contact: ${profileData.email}`,
+            `Contact: ${profileData.email} • ${profileData.phone}`,
             "",
             "Experience highlights:",
-            "  - Senior/Lead Full-Stack engineering across Next.js, Node.js, and Cloud services.",
-            "  - Microservice APIs, database scaling, high concurrency and real-time architectures.",
-            "  - Type 'projects' to review software creations.",
+            "  - Frontend Developer at Softvence (2026 — Present)",
+            "  - Junior Full-Stack Developer — Freelance / Personal Projects (2024 — Present)",
+            "  - MERN Stack, Next.js App Router, REST APIs, NextAuth & MongoDB aggregation pipelines",
+            "  - Type 'projects' to review software creations or 'skills' for tech stack.",
           ].join("\n"),
         };
       }

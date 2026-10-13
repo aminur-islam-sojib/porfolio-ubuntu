@@ -1,17 +1,30 @@
 export interface Profile {
   name: string;
+  fullName: string;
   handle: string;
   title: string;
   subtitle: string;
   bio: string;
   location: string;
   email: string;
+  phone: string;
+  birthday: string;
   website: string;
   avatarUrl: string;
+  resumeUrl: string;
   socials: {
     github: string;
     linkedin: string;
+    facebook?: string;
+    instagram?: string;
+    codeforces?: string;
     twitter?: string;
+  };
+  metrics: {
+    experience: string;
+    projectsCompleted: string;
+    commits: string;
+    support: string;
   };
   systemInfo: {
     osName: string;
@@ -27,18 +40,30 @@ export interface Profile {
 
 export const profileData: Profile = {
   name: "Sojib Ahmed",
-  handle: "sojib-ahmed",
-  title: "Full-Stack Developer",
-  subtitle: "Building resilient web applications & high-performance interactive interfaces",
-  bio: "TODO: Add your personal bio here. E.g., Full-Stack Engineer passionate about TypeScript, React/Next.js, Node.js, and cloud architecture.",
-  location: "TODO: Add your location (e.g., Dhaka, Bangladesh / Remote)",
+  fullName: "Aminur Islam Sojib",
+  handle: "aminur-islam-sojib",
+  title: "Fullstack Developer",
+  subtitle: "Frontend Developer at Softvence • Next.js, React, Node.js & MongoDB Specialist",
+  bio: "Fullstack Developer at Softvence specializing in Next.js, React, Node.js, and MongoDB based in Dhaka, Bangladesh. Experienced in building scalable, user-friendly web applications, REST API integrations, robust authentication (NextAuth, JWT, OAuth), and performance-driven responsive interfaces.",
+  location: "Dhaka, Bangladesh",
   email: "sojibahmed.connect@gmail.com",
-  website: "https://sojib.dev", // TODO: Replace with your actual domain
-  avatarUrl: "/avatars/profile.png", // TODO: Place your avatar image in public/avatars/
+  phone: "+8801522110607",
+  birthday: "Feb 20, 2006",
+  website: "https://sojibahmed.vercel.app",
+  avatarUrl: "/avatars/sojib_profile.jpg",
+  resumeUrl: "/Sojib_Ahmed_Resume.pdf",
   socials: {
-    github: "https://github.com/sojib-ahmed", // TODO: Update with your GitHub profile
-    linkedin: "https://linkedin.com/in/sojib-ahmed", // TODO: Update with your LinkedIn profile
-    twitter: "https://x.com/sojib_ahmed", // TODO: Update with your Twitter/X handle or remove
+    github: "https://github.com/aminur-islam-sojib",
+    linkedin: "https://linkedin.com/in/aminur-islam-sojib/",
+    facebook: "https://facebook.com/sojibahmed.connect",
+    instagram: "https://instagram.com/sojibahmed.dev",
+    codeforces: "https://codeforces.com/profile/sojibahmed.me",
+  },
+  metrics: {
+    experience: "1+ Years Active Development",
+    projectsCompleted: "15+ Projects Completed",
+    commits: "500+ Git Commits",
+    support: "24/7 Available",
   },
   systemInfo: {
     osName: "Ubuntu",
@@ -47,8 +72,7 @@ export const profileData: Profile = {
     uptime: "24/7 Available for hire",
     shell: "bash 5.2.21",
     terminal: "gnome-terminal",
-    cpu: "Full-Stack Engine (React + Node.js + Cloud)",
-    memory: "Unlimited Curiosity / High Capacity",
+    cpu: "Fullstack Engine (Next.js + Node.js + MongoDB)",
+    memory: "MERN Stack / Continuous Innovation",
   },
 };
-

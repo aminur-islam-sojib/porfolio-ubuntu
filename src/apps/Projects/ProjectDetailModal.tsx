@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import { Project } from "@/data/projects";
 import { Button } from "@/components/ui/Button";
 import { ExternalLink, GitBranch, X, Layers, CheckCircle } from "lucide-react";
@@ -27,7 +28,7 @@ export function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps
           <div className="flex items-center gap-2">
             <Layers className="w-4 h-4 text-[var(--ubuntu-orange)]" />
             <span className="text-xs font-semibold text-white truncate">
-              {project.title} — Project Architecture
+              {project.title} — Project Details
             </span>
           </div>
           <button
@@ -42,6 +43,19 @@ export function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps
 
         {/* Modal Content */}
         <div className="p-6 overflow-y-auto space-y-6 text-white text-xs sm:text-sm">
+          {/* Project Image Banner */}
+          {project.thumbnailUrl && (
+            <div className="relative w-full h-48 sm:h-56 rounded-xl overflow-hidden bg-black/40 border border-white/5">
+              <Image
+                src={project.thumbnailUrl}
+                alt={project.title}
+                fill
+                sizes="(max-width: 768px) 100vw, 650px"
+                className="object-cover"
+              />
+            </div>
+          )}
+
           {/* Header */}
           <div className="space-y-1.5">
             <div className="flex items-center gap-2">
@@ -131,4 +145,3 @@ export function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps
     </div>
   );
 }
-

@@ -10,49 +10,73 @@ export interface ExperienceItem {
   technologies: string[];
 }
 
+export interface EducationItem {
+  id: string;
+  degree: string;
+  institution: string;
+  location: string;
+  period: string;
+  field: string;
+}
+
 export const experienceData: ExperienceItem[] = [
   {
     id: "exp-1",
-    role: "Full-Stack Developer",
-    company: "TODO: Current Company / Freelance",
-    location: "Remote / Hybrid",
-    period: "2023 — Present",
+    role: "Frontend Developer",
+    company: "Softvence",
+    location: "Dhaka, Bangladesh",
+    period: "2026 — Present",
     current: true,
-    summary: "TODO: Add overview of your main responsibilities and achievements in this role.",
+    summary: "Developing scalable full-stack web applications and high-performance interactive interfaces using Next.js App Router, React, and TypeScript.",
     highlights: [
-      "TODO: Spearheaded full-stack web applications using Next.js and Node.js microservices.",
-      "TODO: Reduced API response times by 35% through Redis caching and query indexing.",
-      "TODO: Collaborated in agile sprints with cross-functional design and engineering teams.",
+      "Architecting responsive, performant user interfaces with Tailwind CSS and Next.js modern component architecture.",
+      "Integrating RESTful backend APIs, state management pipelines, and robust UI interactions.",
+      "Collaborating in fast-paced sprint cycles with engineering teammates to deliver pixel-perfect client applications.",
     ],
-    technologies: ["React", "Next.js", "TypeScript", "Node.js", "PostgreSQL", "Docker"],
+    technologies: ["Next.js", "React", "TypeScript", "Tailwind CSS", "REST APIs", "Git"],
   },
   {
     id: "exp-2",
-    role: "Frontend Engineer",
-    company: "TODO: Previous Tech Company",
-    location: "On-site / Remote",
-    period: "2022 — 2023",
-    current: false,
-    summary: "TODO: Add overview of your frontend development work.",
+    role: "Junior Full-Stack Developer",
+    company: "Freelance & Independent Projects",
+    location: "Remote / Dhaka, Bangladesh",
+    period: "2024 — Present",
+    current: true,
+    summary: "Developing full-stack MERN and Next.js applications with secure authentication, cloud databases, and payment integration.",
     highlights: [
-      "TODO: Developed high-performance user interfaces with modern React, Tailwind CSS, and state management.",
-      "TODO: Improved web vitals score from 68 to 94 across critical customer-facing pages.",
+      "Developed end-to-end applications using React, TypeScript, Node.js, Express, and MongoDB.",
+      "Implemented secure RBAC authentication with NextAuth (OAuth + credentials validation) and JWT.",
+      "Integrated Stripe payments and automated subscription workflows.",
+      "Engineered analytical dashboards reducing page load times by 25% with component optimization and query caching.",
+      "Managed CI/CD deployment pipelines on Vercel and Netlify with zero-downtime releases.",
     ],
-    technologies: ["React", "TypeScript", "Tailwind CSS", "Redux Toolkit", "REST APIs"],
-  },
-  {
-    id: "exp-3",
-    role: "Junior Software Developer",
-    company: "TODO: First Software Company",
-    location: "On-site",
-    period: "2021 — 2022",
-    current: false,
-    summary: "TODO: Add overview of your early career projects and learnings.",
-    highlights: [
-      "TODO: Built backend CRUD services and database schemas with Node.js and MongoDB.",
-      "TODO: Participated in peer code reviews and unit test coverage expansion.",
-    ],
-    technologies: ["JavaScript", "Node.js", "Express", "MongoDB", "Git"],
+    technologies: ["Next.js", "React", "TypeScript", "Node.js", "Express", "MongoDB", "Tailwind CSS", "NextAuth", "Stripe"],
   },
 ];
 
+export const educationData: EducationItem[] = [
+  {
+    id: "edu-1",
+    degree: "BSc in Computer Science & Engineering (CSE)",
+    institution: "University of Scholars",
+    location: "Dhaka, Bangladesh",
+    period: "2025 — Ongoing",
+    field: "Computer Science & Engineering",
+  },
+  {
+    id: "edu-2",
+    degree: "Higher Secondary Certificate (HSC)",
+    institution: "SMMPLSC Rajshahi",
+    location: "Rajshahi, Bangladesh",
+    period: "2023 — 2024",
+    field: "Science",
+  },
+  {
+    id: "edu-3",
+    degree: "Secondary School Certificate (SSC)",
+    institution: "Nazirpur High School",
+    location: "Natore, Bangladesh",
+    period: "2021 — 2022",
+    field: "Science",
+  },
+];

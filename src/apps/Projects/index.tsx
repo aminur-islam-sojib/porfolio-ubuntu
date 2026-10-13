@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import { projectsData, Project } from "@/data/projects";
 import { ProjectDetailModal } from "@/apps/Projects/ProjectDetailModal";
 import { ExternalLink, GitBranch, Search, Info } from "lucide-react";
@@ -17,7 +18,6 @@ export default function ProjectsApp() {
     { id: "all", label: "All Projects" },
     { id: "full-stack", label: "Full-Stack" },
     { id: "frontend", label: "Frontend" },
-    { id: "backend", label: "Backend" },
   ];
 
   const filteredProjects = React.useMemo(() => {
@@ -41,7 +41,7 @@ export default function ProjectsApp() {
         <div>
           <h1 className="text-xl font-bold tracking-tight">Software Engineering Portfolio</h1>
           <p className="text-xs text-zinc-400 mt-0.5">
-            Architectural case studies, full-stack systems, and deployed microservices
+            Full-stack web applications, telemedicine platforms, and responsive interfaces
           </p>
         </div>
 
@@ -89,13 +89,27 @@ export default function ProjectsApp() {
           </Button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {filteredProjects.map((project) => (
             <div
               key={project.id}
-              className="p-5 rounded-[var(--window-radius)] bg-white/5 border border-white/10 hover:border-white/20 transition-all flex flex-col justify-between space-y-4 group"
+              className="p-4 rounded-[var(--window-radius)] bg-white/5 border border-white/10 hover:border-white/20 transition-all flex flex-col justify-between space-y-4 group overflow-hidden"
             >
               <div className="space-y-3">
+                {/* Project Screenshot / Thumbnail */}
+                {project.thumbnailUrl && (
+                  <div className="relative w-full h-44 rounded-xl overflow-hidden bg-black/40 border border-white/5">
+                    <Image
+                      src={project.thumbnailUrl}
+                      alt={project.title}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 500px"
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+                  </div>
+                )}
+
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded bg-[var(--ubuntu-orange)]/20 text-[var(--ubuntu-orange)] border border-[var(--ubuntu-orange)]/30">
                     {project.category}
@@ -106,8 +120,9 @@ export default function ProjectsApp() {
                         href={project.githubUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="p-1 rounded hover:bg-white/10 text-zinc-400 hover:text-white transition-colors"
+                        className="p-1.5 rounded hover:bg-white/10 text-zinc-400 hover:text-white transition-colors"
                         aria-label="GitHub Repository"
+                        title="GitHub Repository"
                       >
                         <GitBranch className="w-3.5 h-3.5" />
                       </a>
@@ -117,8 +132,9 @@ export default function ProjectsApp() {
                         href={project.liveUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="p-1 rounded hover:bg-white/10 text-zinc-400 hover:text-white transition-colors"
+                        className="p-1.5 rounded hover:bg-white/10 text-zinc-400 hover:text-white transition-colors"
                         aria-label="Live Demo"
+                        title="Live Site"
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
                       </a>
@@ -130,7 +146,7 @@ export default function ProjectsApp() {
                   <h2 className="text-base font-bold text-white group-hover:text-[var(--ubuntu-orange)] transition-colors">
                     {project.title}
                   </h2>
-                  <p className="text-xs text-zinc-300 leading-relaxed">
+                  <p className="text-xs text-zinc-300 leading-relaxed line-clamp-2">
                     {project.tagline}
                   </p>
                 </div>
@@ -161,7 +177,7 @@ export default function ProjectsApp() {
                   className="w-full gap-1.5 text-xs h-8"
                 >
                   <Info className="w-3.5 h-3.5" />
-                  <span>View Architectural Details</span>
+                  <span>View Project Details</span>
                 </Button>
               </div>
             </div>
