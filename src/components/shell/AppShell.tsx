@@ -16,6 +16,11 @@ export function AppShell() {
   // Root-level hydration of user appearance preferences
   React.useEffect(() => {
     try {
+      const savedTheme = localStorage.getItem("ubuntu_theme") as "dark" | "light" | null;
+      if (savedTheme) {
+        useSystemStore.getState().setTheme(savedTheme);
+      }
+
       const savedWallpaper = localStorage.getItem("ubuntu_wallpaper");
       if (savedWallpaper) {
         useSystemStore.setState({ wallpaper: savedWallpaper });

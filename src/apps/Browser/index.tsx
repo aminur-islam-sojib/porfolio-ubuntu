@@ -233,9 +233,9 @@ export default function BrowserApp() {
       Boolean(iframeFailed[activeTab.id]));
 
   return (
-    <div className="h-full w-full flex flex-col bg-[#202124] text-white select-none font-sans overflow-hidden">
+    <div className="h-full w-full flex flex-col bg-[var(--color-chrome-tabstrip)] text-[var(--color-text-primary)] select-none font-sans overflow-hidden">
       {/* 1. Chrome Tab Strip */}
-      <div className="h-10 bg-[#202124] px-2 pt-1 flex items-end gap-1 overflow-x-auto border-b border-[#35363a] scrollbar-none">
+      <div className="h-10 bg-[var(--color-chrome-tabstrip)] px-2 pt-1 flex items-end gap-1 overflow-x-auto border-b border-[var(--color-chrome-border)] scrollbar-none">
         {tabs.map((tab) => {
           const isActive = tab.id === activeTabId;
           return (
@@ -244,8 +244,8 @@ export default function BrowserApp() {
               onClick={() => setActiveTabId(tab.id)}
               className={`group relative flex items-center justify-between gap-2 max-w-[210px] min-w-[120px] h-9 px-3 rounded-t-lg transition-colors cursor-pointer select-none text-xs border-t border-x ${
                 isActive
-                  ? "bg-[#292a2d] text-white font-medium border-white/10 shadow-sm"
-                  : "bg-transparent text-zinc-400 hover:bg-[#28292c] hover:text-zinc-200 border-transparent"
+                  ? "bg-[var(--color-chrome-toolbar)] text-[var(--color-text-primary)] font-medium border-[var(--color-chrome-border)] shadow-sm"
+                  : "bg-transparent text-[var(--color-text-secondary)] hover:bg-[var(--color-card-hover)] hover:text-[var(--color-text-primary)] border-transparent"
               }`}
             >
               <div className="flex items-center gap-2 min-w-0 flex-1">
@@ -257,7 +257,7 @@ export default function BrowserApp() {
                 type="button"
                 onClick={(e) => handleCloseTab(tab.id, e)}
                 aria-label={`Close tab ${tab.title}`}
-                className="p-1 rounded-full opacity-60 group-hover:opacity-100 hover:bg-white/20 text-zinc-300 hover:text-white transition-opacity"
+                className="p-1 rounded-full opacity-60 group-hover:opacity-100 hover:bg-[var(--color-control-bg)] text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-opacity"
               >
                 <X className="w-3 h-3" />
               </button>
@@ -270,7 +270,7 @@ export default function BrowserApp() {
           type="button"
           onClick={() => handleAddTab()}
           aria-label="New tab"
-          className="p-2 mb-1 rounded-full hover:bg-white/10 text-zinc-400 hover:text-white transition-colors"
+          className="p-2 mb-1 rounded-full hover:bg-[var(--color-card-hover)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"
           title="New tab"
         >
           <Plus className="w-4 h-4" />
@@ -278,14 +278,14 @@ export default function BrowserApp() {
       </div>
 
       {/* 2. Chrome Navigation Toolbar */}
-      <div className="h-11 px-3 bg-[#292a2d] flex items-center gap-2 text-xs border-b border-[#35363a]">
-        <div className="flex items-center gap-0.5 text-zinc-400">
+      <div className="h-11 px-3 bg-[var(--color-chrome-toolbar)] flex items-center gap-2 text-xs border-b border-[var(--color-chrome-border)]">
+        <div className="flex items-center gap-0.5 text-[var(--color-text-secondary)]">
           <button
             type="button"
             onClick={handleGoBack}
             disabled={!activeTab || activeTab.historyIndex <= 0}
             aria-label="Back"
-            className="p-1.5 rounded-full hover:bg-white/10 hover:text-white disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+            className="p-1.5 rounded-full hover:bg-[var(--color-card-hover)] hover:text-[var(--color-text-primary)] disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
             title="Click to go back"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -295,7 +295,7 @@ export default function BrowserApp() {
             onClick={handleGoForward}
             disabled={!activeTab || activeTab.historyIndex >= activeTab.history.length - 1}
             aria-label="Forward"
-            className="p-1.5 rounded-full hover:bg-white/10 hover:text-white disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+            className="p-1.5 rounded-full hover:bg-[var(--color-card-hover)] hover:text-[var(--color-text-primary)] disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
             title="Click to go forward"
           >
             <ArrowRight className="w-4 h-4" />
@@ -304,7 +304,7 @@ export default function BrowserApp() {
             type="button"
             onClick={() => setIframeKey((prev) => prev + 1)}
             aria-label="Reload"
-            className="p-1.5 rounded-full hover:bg-white/10 hover:text-white transition-colors"
+            className="p-1.5 rounded-full hover:bg-[var(--color-card-hover)] hover:text-[var(--color-text-primary)] transition-colors"
             title="Reload this page"
           >
             <RotateCw className="w-3.5 h-3.5" />
@@ -313,7 +313,7 @@ export default function BrowserApp() {
             type="button"
             onClick={() => handleNavigate("chrome://newtab")}
             aria-label="Home"
-            className="p-1.5 rounded-full hover:bg-white/10 hover:text-white transition-colors"
+            className="p-1.5 rounded-full hover:bg-[var(--color-card-hover)] hover:text-[var(--color-text-primary)] transition-colors"
             title="Open the homepage"
           >
             <Home className="w-4 h-4" />
@@ -321,7 +321,7 @@ export default function BrowserApp() {
         </div>
 
         {/* Omnibox (Search / URL Bar) */}
-        <div className="flex-1 flex items-center gap-2 h-8 px-3.5 rounded-full bg-[#202124] border border-white/10 focus-within:border-white/20 text-xs shadow-inner">
+        <div className="flex-1 flex items-center gap-2 h-8 px-3.5 rounded-full bg-[var(--color-chrome-omnibox)] border border-[var(--color-chrome-border)] focus-within:border-[var(--ubuntu-orange)] text-xs shadow-inner">
           <Lock className="w-3 h-3 text-emerald-400 shrink-0" />
           <input
             type="text"
@@ -330,9 +330,9 @@ export default function BrowserApp() {
             onKeyDown={handleKeyDown}
             aria-label="Search or enter URL"
             placeholder="Search Google or type a URL"
-            className="w-full bg-transparent text-white outline-none border-none text-xs font-mono placeholder-zinc-500"
+            className="w-full bg-transparent text-[var(--color-text-primary)] outline-none border-none text-xs font-mono placeholder-[var(--color-text-muted)]"
           />
-          <Star className="w-3.5 h-3.5 text-zinc-500 hover:text-amber-400 cursor-pointer shrink-0 transition-colors" />
+          <Star className="w-3.5 h-3.5 text-[var(--color-text-muted)] hover:text-amber-400 cursor-pointer shrink-0 transition-colors" />
         </div>
 
         {/* Right Chrome Actions */}
@@ -343,7 +343,7 @@ export default function BrowserApp() {
               href={activeTab.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-1.5 rounded-full hover:bg-white/10 text-zinc-400 hover:text-[var(--ubuntu-orange)] transition-colors"
+              className="p-1.5 rounded-full hover:bg-[var(--color-card-hover)] text-[var(--color-text-secondary)] hover:text-[var(--ubuntu-orange)] transition-colors"
               title="Open current page in system browser"
             >
               <ExternalLink className="w-4 h-4" />
@@ -352,7 +352,7 @@ export default function BrowserApp() {
 
           {/* Profile Avatar */}
           <div
-            className="relative w-6 h-6 rounded-full overflow-hidden border border-white/20 shrink-0 cursor-pointer"
+            className="relative w-6 h-6 rounded-full overflow-hidden border border-[var(--color-border-subtle)] shrink-0 cursor-pointer"
             title={`Signed in as ${profileData.name} (${profileData.email})`}
           >
             <Image
@@ -367,7 +367,7 @@ export default function BrowserApp() {
           <button
             type="button"
             aria-label="Customize and control Google Chrome"
-            className="p-1 rounded-full hover:bg-white/10 text-zinc-400 hover:text-white"
+            className="p-1 rounded-full hover:bg-[var(--color-card-hover)] text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
           >
             <MoreVertical className="w-4 h-4" />
           </button>
@@ -375,13 +375,13 @@ export default function BrowserApp() {
       </div>
 
       {/* 3. Bookmarks Bar */}
-      <div className="h-7 px-3 bg-[#292a2d] border-b border-[#35363a] flex items-center gap-3 text-[11px] text-zinc-400 overflow-x-auto scrollbar-none">
+      <div className="h-7 px-3 bg-[var(--color-chrome-toolbar)] border-b border-[var(--color-chrome-border)] flex items-center gap-3 text-[11px] text-[var(--color-text-secondary)] overflow-x-auto scrollbar-none">
         {bookmarks.map((bm) => (
           <button
             key={bm.label}
             type="button"
             onClick={() => handleNavigate(bm.url)}
-            className="flex items-center gap-1.5 px-2 py-0.5 rounded hover:bg-white/10 hover:text-white transition-colors shrink-0"
+            className="flex items-center gap-1.5 px-2 py-0.5 rounded hover:bg-[var(--color-card-hover)] hover:text-[var(--color-text-primary)] transition-colors shrink-0"
           >
             <bm.icon className="w-3 h-3 text-[var(--ubuntu-orange)]" />
             <span>{bm.label}</span>
@@ -390,7 +390,7 @@ export default function BrowserApp() {
       </div>
 
       {/* 4. Active Tab Content Viewport */}
-      <div className="flex-1 relative w-full h-full bg-[#202124]">
+      <div className="flex-1 relative w-full h-full bg-[var(--color-chrome-omnibox)]">
         {activeTab.url === "chrome://newtab" || activeTab.url === "about:blank" ? (
           <ChromeNewTab onNavigate={handleNavigate} />
         ) : isSearchQuery ? (

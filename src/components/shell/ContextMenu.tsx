@@ -56,7 +56,7 @@ export function ContextMenu({ x, y, onClose }: ContextMenuProps) {
       ref={menuRef}
       role="menu"
       style={{ left: x, top: y }}
-      className="fixed z-[99999] min-w-[210px] rounded-[var(--control-radius)] bg-[#242424]/95 backdrop-blur-md border border-white/10 shadow-[var(--shadow-popover)] py-1.5 text-xs text-white select-none animate-in fade-in zoom-in-95 duration-100"
+      className="fixed z-[99999] min-w-[210px] rounded-[var(--control-radius)] bg-[var(--color-card-bg)]/95 backdrop-blur-md border border-[var(--color-border-subtle)] shadow-[var(--shadow-popover)] py-1.5 text-xs text-[var(--color-text-primary)] select-none animate-in fade-in zoom-in-95 duration-100"
       onClick={(e) => e.stopPropagation()}
     >
       <button
@@ -76,7 +76,7 @@ export function ContextMenu({ x, y, onClose }: ContextMenuProps) {
         <span>New Folder</span>
       </button>
 
-      <div className="my-1 border-t border-white/10" />
+      <div className="my-1 border-t border-[var(--color-border-subtle)]" />
 
       <button
         type="button"
@@ -90,7 +90,7 @@ export function ContextMenu({ x, y, onClose }: ContextMenuProps) {
           <Terminal className="w-4 h-4 text-emerald-400" />
           <span>Open in Terminal</span>
         </span>
-        <span className="text-[10px] text-zinc-400">Ctrl+Alt+T</span>
+        <span className="text-[10px] text-[var(--color-text-muted)]">Ctrl+Alt+T</span>
       </button>
 
       <button
@@ -113,7 +113,7 @@ export function ContextMenu({ x, y, onClose }: ContextMenuProps) {
         }
         className="w-full px-3.5 py-1.5 flex items-center gap-2.5 text-left hover:bg-[var(--ubuntu-orange)] hover:text-white transition-colors"
       >
-        <Settings className="w-4 h-4 text-zinc-400" />
+        <Settings className="w-4 h-4 text-[var(--color-text-muted)]" />
         <span>Display Settings</span>
       </button>
 
@@ -131,7 +131,7 @@ export function ContextMenu({ x, y, onClose }: ContextMenuProps) {
           )}
           <span>{isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}</span>
         </span>
-        <span className="text-[10px] text-zinc-400">F11</span>
+        <span className="text-[10px] text-[var(--color-text-muted)]">F11</span>
       </button>
 
       <button
@@ -148,10 +148,10 @@ export function ContextMenu({ x, y, onClose }: ContextMenuProps) {
           )}
           <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
         </span>
-        <span className="text-[10px] text-zinc-400 capitalize">{theme}</span>
+        <span className="text-[10px] text-[var(--color-text-muted)] capitalize">{theme}</span>
       </button>
 
-      <div className="my-1 border-t border-white/10" />
+      <div className="my-1 border-t border-[var(--color-border-subtle)]" />
 
       <button
         type="button"

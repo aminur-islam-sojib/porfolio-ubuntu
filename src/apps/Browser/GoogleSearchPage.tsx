@@ -53,9 +53,9 @@ export function GoogleSearchPage({ query, onNavigate }: GoogleSearchPageProps) {
   ];
 
   return (
-    <div className="w-full h-full bg-[#202124] text-zinc-300 font-sans overflow-y-auto select-text">
+    <div className="w-full h-full bg-[var(--color-chrome-toolbar)] text-[var(--color-text-secondary)] font-sans overflow-y-auto select-text">
       {/* Top Google Search Header */}
-      <div className="sticky top-0 bg-[#202124] border-b border-[#3c4043] px-4 sm:px-8 py-3.5 z-10 space-y-3">
+      <div className="sticky top-0 bg-[var(--color-chrome-toolbar)] border-b border-[var(--color-chrome-border)] px-4 sm:px-8 py-3.5 z-10 space-y-3">
         <div className="flex items-center gap-4 sm:gap-6">
           <button
             type="button"
@@ -76,12 +76,12 @@ export function GoogleSearchPage({ query, onNavigate }: GoogleSearchPageProps) {
                 type="text"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                className="w-full h-10 pl-4 pr-10 rounded-full bg-[#303134] text-white text-xs sm:text-sm border border-transparent hover:border-[#5f6368] focus:border-white/30 focus:bg-[#303134] outline-none shadow-sm"
+                className="w-full h-10 pl-4 pr-10 rounded-full bg-[var(--color-chrome-omnibox)] text-[var(--color-text-primary)] text-xs sm:text-sm border border-[var(--color-chrome-border)] hover:border-[var(--ubuntu-orange)]/40 focus:border-[var(--ubuntu-orange)] outline-none shadow-sm"
               />
               <button
                 type="submit"
                 aria-label="Search"
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)]"
               >
                 <Search className="w-4 h-4" />
               </button>
@@ -90,29 +90,29 @@ export function GoogleSearchPage({ query, onNavigate }: GoogleSearchPageProps) {
         </div>
 
         {/* Search Filter Tabs */}
-        <div className="flex items-center gap-6 text-xs text-zinc-400 pl-0 sm:pl-28">
-          <span className="text-[#8ab4f8] font-medium border-b-2 border-[#8ab4f8] pb-1 cursor-pointer">
+        <div className="flex items-center gap-6 text-xs text-[var(--color-text-muted)] pl-0 sm:pl-28">
+          <span className="text-[var(--ubuntu-orange)] font-medium border-b-2 border-[var(--ubuntu-orange)] pb-1 cursor-pointer">
             All
           </span>
-          <span className="hover:text-zinc-200 cursor-pointer">Images</span>
-          <span className="hover:text-zinc-200 cursor-pointer">Videos</span>
-          <span className="hover:text-zinc-200 cursor-pointer">News</span>
-          <span className="hover:text-zinc-200 cursor-pointer">Maps</span>
+          <span className="hover:text-[var(--color-text-primary)] cursor-pointer">Images</span>
+          <span className="hover:text-[var(--color-text-primary)] cursor-pointer">Videos</span>
+          <span className="hover:text-[var(--color-text-primary)] cursor-pointer">News</span>
+          <span className="hover:text-[var(--color-text-primary)] cursor-pointer">Maps</span>
         </div>
       </div>
 
       {/* Search Results Content */}
       <div className="max-w-3xl px-4 sm:px-8 py-4 space-y-6 sm:ml-28">
-        <p className="text-xs text-zinc-400">
-          About 1,480,000 results for &quot;<strong className="text-zinc-200">{query}</strong>&quot; (0.24 seconds)
+        <p className="text-xs text-[var(--color-text-muted)]">
+          About 1,480,000 results for &quot;<strong className="text-[var(--color-text-primary)]">{query}</strong>&quot; (0.24 seconds)
         </p>
 
         {/* Knowledge Panel Banner */}
-        <div className="p-4 rounded-xl bg-[#303134] border border-[#3c4043] flex items-start gap-4 text-xs">
-          <Sparkles className="w-5 h-5 text-[#8ab4f8] shrink-0 mt-0.5" />
+        <div className="p-4 rounded-xl bg-[var(--color-card-bg)] border border-[var(--color-border-subtle)] flex items-start gap-4 text-xs shadow-sm">
+          <Sparkles className="w-5 h-5 text-[var(--ubuntu-orange)] shrink-0 mt-0.5" />
           <div className="space-y-1">
-            <span className="font-semibold text-white">Featured Developer Profile</span>
-            <p className="text-zinc-300 leading-relaxed">
+            <span className="font-semibold text-[var(--color-text-primary)]">Featured Developer Profile</span>
+            <p className="text-[var(--color-text-secondary)] leading-relaxed">
               {profileData.name} ({profileData.fullName}) is a {profileData.title} at Softvence specializing in Next.js, React, Node.js, and MongoDB based in Dhaka, Bangladesh.
             </p>
           </div>
@@ -122,8 +122,8 @@ export function GoogleSearchPage({ query, onNavigate }: GoogleSearchPageProps) {
         <div className="space-y-6">
           {results.map((res, idx) => (
             <article key={idx} className="space-y-1 text-xs">
-              <div className="flex items-center gap-2 text-[11px] text-zinc-400">
-                <Globe className="w-3.5 h-3.5 text-zinc-500" />
+              <div className="flex items-center gap-2 text-[11px] text-[var(--color-text-muted)]">
+                <Globe className="w-3.5 h-3.5 text-[var(--color-text-muted)]" />
                 <span className="truncate">{res.displayUrl}</span>
               </div>
 
@@ -131,14 +131,14 @@ export function GoogleSearchPage({ query, onNavigate }: GoogleSearchPageProps) {
                 <button
                   type="button"
                   onClick={() => onNavigate(res.url)}
-                  className="text-[#8ab4f8] hover:underline text-left cursor-pointer inline-flex items-center gap-1.5"
+                  className="text-[#1a0dab] dark:text-[#8ab4f8] hover:underline text-left cursor-pointer inline-flex items-center gap-1.5 font-medium"
                 >
                   <span>{res.title}</span>
                   <ExternalLink className="w-3 h-3 opacity-70" />
                 </button>
               </h2>
 
-              <p className="text-zinc-300 leading-relaxed text-xs">
+              <p className="text-[var(--color-text-secondary)] leading-relaxed text-xs">
                 {res.snippet}
               </p>
 
@@ -149,7 +149,7 @@ export function GoogleSearchPage({ query, onNavigate }: GoogleSearchPageProps) {
                       key={sl.label}
                       type="button"
                       onClick={() => onNavigate(sl.url)}
-                      className="p-2 rounded-lg bg-[#303134]/60 hover:bg-[#303134] text-left text-[11px] text-[#8ab4f8] hover:underline border border-white/5"
+                      className="p-2 rounded-lg bg-[var(--color-card-bg)] hover:bg-[var(--color-card-hover)] text-left text-[11px] text-[#1a0dab] dark:text-[#8ab4f8] hover:underline border border-[var(--color-border-subtle)] shadow-xs"
                     >
                       {sl.label}
                     </button>

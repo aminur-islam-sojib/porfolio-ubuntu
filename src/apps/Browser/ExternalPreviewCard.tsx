@@ -141,11 +141,11 @@ export function ExternalPreviewCard({ url }: ExternalPreviewCardProps) {
   }
 
   return (
-    <div className="w-full h-full bg-[#1e1e1e] text-white p-6 sm:p-10 flex flex-col items-center justify-center text-center space-y-4 font-sans">
+    <div className="w-full h-full bg-[var(--color-window-bg)] text-[var(--color-text-primary)] p-6 sm:p-10 flex flex-col items-center justify-center text-center space-y-4 font-sans">
       <Shield className="w-12 h-12 text-amber-400" />
       <div className="space-y-1 max-w-md">
         <h2 className="text-base font-bold">External Site Frame Restriction</h2>
-        <p className="text-xs text-zinc-400 leading-relaxed">
+        <p className="text-xs text-[var(--color-text-muted)] leading-relaxed">
           This website (<code>{url}</code>) sets <code>X-Frame-Options: SAMEORIGIN</code> to prevent embedding inside iframes.
         </p>
       </div>

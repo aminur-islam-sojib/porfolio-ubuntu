@@ -28,10 +28,10 @@ export default function TrashApp() {
   };
 
   return (
-    <div className="h-full w-full flex flex-col bg-[#1E1E1E] text-white font-sans text-xs select-none">
+    <div className="h-full w-full flex flex-col bg-[var(--color-window-bg)] text-[var(--color-text-primary)] font-sans text-xs select-none">
       {/* Top Action Bar */}
-      <div className="h-10 px-4 bg-[#252526] border-b border-white/5 flex items-center justify-between">
-        <span className="text-zinc-400">
+      <div className="h-10 px-4 bg-[var(--color-window-header-inactive)] border-b border-[var(--color-border-subtle)] flex items-center justify-between">
+        <span className="text-[var(--color-text-secondary)]">
           {items.length} {items.length === 1 ? "item" : "items"} in Trash
         </span>
         <div className="flex items-center gap-2">
@@ -61,12 +61,12 @@ export default function TrashApp() {
       {/* Main Content Area */}
       {items.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center p-8 text-center space-y-3">
-          <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-zinc-500">
+          <div className="w-16 h-16 rounded-2xl bg-[var(--color-card-bg)] border border-[var(--color-border-subtle)] flex items-center justify-center text-[var(--color-text-muted)] shadow-sm">
             <Trash2 className="w-8 h-8" />
           </div>
           <div>
-            <h2 className="text-base font-semibold">Trash is Empty</h2>
-            <p className="text-xs text-zinc-400 max-w-xs mt-1">
+            <h2 className="text-base font-semibold text-[var(--color-text-primary)]">Trash is Empty</h2>
+            <p className="text-xs text-[var(--color-text-muted)] max-w-xs mt-1">
               No deleted items or discarded portfolio files.
             </p>
           </div>
@@ -76,14 +76,14 @@ export default function TrashApp() {
           {items.map((item) => (
             <div
               key={item.name}
-              className="p-4 rounded-xl bg-white/5 border border-white/5 flex flex-col items-center text-center gap-2"
+              className="p-4 rounded-xl bg-[var(--color-card-bg)] border border-[var(--color-border-subtle)] flex flex-col items-center text-center gap-2 shadow-sm"
             >
               <AlertCircle className="w-10 h-10 text-red-400 opacity-80" />
               <div>
-                <span className="font-medium text-white block truncate max-w-[120px]">
+                <span className="font-medium text-[var(--color-text-primary)] block truncate max-w-[120px]">
                   {item.name}
                 </span>
-                <span className="text-[10px] text-zinc-400 block">{item.size} • {item.date}</span>
+                <span className="text-[10px] text-[var(--color-text-muted)] block">{item.size} • {item.date}</span>
               </div>
             </div>
           ))}

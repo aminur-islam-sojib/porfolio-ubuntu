@@ -43,8 +43,8 @@ export function TitleBar({
         className={cn(
           "window-drag-handle h-[var(--titlebar-height)] px-3.5 flex items-center justify-between border-b select-none transition-colors duration-150 cursor-default",
           isFocused
-            ? "bg-[#2E2E2E] text-white border-white/10"
-            : "bg-[#242424] text-white/50 border-white/5",
+            ? "bg-[var(--color-window-header)] text-[var(--color-text-primary)] border-[var(--color-border-subtle)]"
+            : "bg-[var(--color-window-header-inactive)] text-[var(--color-text-secondary)] border-[var(--color-border-subtle)]",
           isMaximized ? "rounded-none" : "rounded-t-[var(--window-radius)]"
         )}
       >

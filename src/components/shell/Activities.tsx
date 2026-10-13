@@ -197,15 +197,15 @@ export function Activities() {
                       key={id}
                       type="button"
                       onClick={() => handleOpenApp(id)}
-                      className="w-56 h-36 rounded-xl bg-[#242424]/90 border border-white/15 hover:border-[var(--ubuntu-orange)] hover:scale-105 transition-all shadow-xl p-3 flex flex-col justify-between text-left group"
+                      className="w-56 h-36 rounded-xl bg-[var(--color-card-bg)] border border-[var(--color-border-subtle)] hover:border-[var(--ubuntu-orange)] hover:scale-105 transition-all shadow-xl p-3 flex flex-col justify-between text-left group"
                     >
                       <div className="flex items-center gap-2">
                         <AppIcon id={id} size={20} className="shadow-none rounded-[4px]" />
-                        <span className="text-xs font-medium text-white truncate">
+                        <span className="text-xs font-medium text-[var(--color-text-primary)] truncate">
                           {win.title}
                         </span>
                       </div>
-                      <div className="p-2 rounded bg-black/30 border border-white/5 text-[10px] text-zinc-400 text-center">
+                      <div className="p-2 rounded bg-[var(--color-input-bg)] border border-[var(--color-border-subtle)] text-[10px] text-[var(--color-text-muted)] text-center">
                         Click to Focus Window
                       </div>
                     </button>

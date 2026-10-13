@@ -20,14 +20,14 @@ export function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps
       onClick={onClose}
     >
       <div
-        className="w-full max-w-2xl bg-[#242424] border border-white/10 rounded-[var(--window-radius)] shadow-[var(--shadow-window)] overflow-hidden flex flex-col max-h-[85vh] animate-in zoom-in-95 duration-150"
+        className="w-full max-w-2xl bg-[var(--color-window-bg)] border border-[var(--color-border-subtle)] rounded-[var(--window-radius)] shadow-[var(--shadow-window)] overflow-hidden flex flex-col max-h-[85vh] animate-in zoom-in-95 duration-150"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Title Bar */}
-        <div className="h-[var(--titlebar-height)] px-4 bg-[#2E2E2E] border-b border-white/10 flex items-center justify-between">
+        <div className="h-[var(--titlebar-height)] px-4 bg-[var(--color-window-header)] border-b border-[var(--color-border-subtle)] flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Layers className="w-4 h-4 text-[var(--ubuntu-orange)]" />
-            <span className="text-xs font-semibold text-white truncate">
+            <span className="text-xs font-semibold text-[var(--color-text-primary)] truncate">
               {project.title} — Project Details
             </span>
           </div>
@@ -35,17 +35,17 @@ export function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps
             type="button"
             onClick={onClose}
             aria-label="Close dialog"
-            className="w-6 h-6 rounded-full hover:bg-white/10 flex items-center justify-center text-zinc-400 hover:text-white transition-colors"
+            className="w-6 h-6 rounded-full hover:bg-[var(--color-card-hover)] flex items-center justify-center text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Modal Content */}
-        <div className="p-6 overflow-y-auto space-y-6 text-white text-xs sm:text-sm">
+        <div className="p-6 overflow-y-auto space-y-6 text-[var(--color-text-primary)] text-xs sm:text-sm">
           {/* Project Image Banner */}
           {project.thumbnailUrl && (
-            <div className="relative w-full h-48 sm:h-56 rounded-xl overflow-hidden bg-black/40 border border-white/5">
+            <div className="relative w-full h-48 sm:h-56 rounded-xl overflow-hidden bg-[var(--color-input-bg)] border border-[var(--color-border-subtle)]">
               <Image
                 src={project.thumbnailUrl}
                 alt={project.title}
@@ -68,18 +68,18 @@ export function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps
                 </span>
               )}
             </div>
-            <h2 className="text-xl font-bold tracking-tight text-white">
+            <h2 className="text-xl font-bold tracking-tight text-[var(--color-text-primary)]">
               {project.title}
             </h2>
-            <p className="text-xs text-zinc-300">{project.tagline}</p>
+            <p className="text-xs text-[var(--color-text-secondary)]">{project.tagline}</p>
           </div>
 
           {/* Description */}
           <div className="space-y-2">
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
               Overview & Architecture
             </h3>
-            <div className="p-4 rounded-xl bg-black/30 border border-white/5 leading-relaxed text-zinc-200">
+            <div className="p-4 rounded-xl bg-[var(--color-card-bg)] border border-[var(--color-border-subtle)] leading-relaxed text-[var(--color-text-secondary)]">
               {project.description}
             </div>
           </div>
@@ -87,14 +87,14 @@ export function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps
           {/* Key Metrics / Highlights */}
           {project.metrics && project.metrics.length > 0 && (
             <div className="space-y-2">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
                 Key Performance Metrics & Features
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {project.metrics.map((metric, i) => (
                   <div
                     key={i}
-                    className="p-3 rounded-lg bg-white/5 border border-white/5 flex items-center gap-2.5 text-xs text-zinc-200"
+                    className="p-3 rounded-lg bg-[var(--color-card-bg)] border border-[var(--color-border-subtle)] flex items-center gap-2.5 text-xs text-[var(--color-text-primary)]"
                   >
                     <CheckCircle className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                     <span>{metric}</span>
@@ -106,14 +106,14 @@ export function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps
 
           {/* Technologies Stack */}
           <div className="space-y-2">
-            <h3 className="text-xs font-semibold uppercase tracking-wider text-zinc-400">
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-muted)]">
               Tech Stack
             </h3>
             <div className="flex flex-wrap gap-2">
               {project.technologies.map((tech) => (
                 <span
                   key={tech}
-                  className="px-2.5 py-1 rounded-[var(--control-radius)] bg-white/10 text-white font-medium text-xs border border-white/5"
+                  className="px-2.5 py-1 rounded-[var(--control-radius)] bg-[var(--color-card-bg)] text-[var(--color-text-primary)] font-medium text-xs border border-[var(--color-border-subtle)]"
                 >
                   {tech}
                 </span>
@@ -123,7 +123,7 @@ export function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps
         </div>
 
         {/* Action Footer */}
-        <div className="p-4 bg-[#1E1E1E] border-t border-white/10 flex items-center justify-end gap-3">
+        <div className="p-4 bg-[var(--color-window-header)] border-t border-[var(--color-border-subtle)] flex items-center justify-end gap-3">
           {project.githubUrl && (
             <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
               <Button variant="default" size="sm" className="gap-1.5">

@@ -35,9 +35,9 @@ export function Slider({
         disabled={disabled}
         aria-label={ariaLabel}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="w-full h-1.5 bg-[#444444] rounded-full appearance-none cursor-pointer accent-[var(--ubuntu-orange)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ubuntu-orange)] disabled:opacity-50"
+        className="w-full h-1.5 bg-[var(--color-control-bg)] rounded-full appearance-none cursor-pointer accent-[var(--ubuntu-orange)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ubuntu-orange)] disabled:opacity-50"
         style={{
-          background: `linear-gradient(to right, var(--ubuntu-orange) 0%, var(--ubuntu-orange) ${percentage}%, #444444 ${percentage}%, #444444 100%)`,
+          background: `linear-gradient(to right, var(--ubuntu-orange) 0%, var(--ubuntu-orange) ${percentage}%, var(--color-control-bg) ${percentage}%, var(--color-control-bg) 100%)`,
         }}
       />
     </div>

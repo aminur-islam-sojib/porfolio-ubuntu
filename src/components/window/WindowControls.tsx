@@ -24,9 +24,9 @@ export function WindowControls({
         type="button"
         onClick={onMinimize}
         aria-label="Minimize Window"
-        className="group relative w-3.5 h-3.5 rounded-full bg-[#484848] hover:bg-[#5a5a5a] active:bg-[#383838] flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ubuntu-orange)]"
+        className="group relative w-3.5 h-3.5 rounded-full bg-[var(--color-control-bg)] hover:bg-[var(--color-control-hover)] active:bg-[var(--color-control-active)] flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ubuntu-orange)]"
       >
-        <Minus className="w-2 h-2 text-white/0 group-hover:text-white/80 transition-colors" />
+        <Minus className="w-2 h-2 opacity-0 group-hover:opacity-100 text-[var(--color-control-glyph)] transition-opacity" />
       </button>
 
       {/* Maximize / Restore */}
@@ -34,12 +34,12 @@ export function WindowControls({
         type="button"
         onClick={onMaximize}
         aria-label={isMaximized ? "Restore Window" : "Maximize Window"}
-        className="group relative w-3.5 h-3.5 rounded-full bg-[#484848] hover:bg-[#5a5a5a] active:bg-[#383838] flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ubuntu-orange)]"
+        className="group relative w-3.5 h-3.5 rounded-full bg-[var(--color-control-bg)] hover:bg-[var(--color-control-hover)] active:bg-[var(--color-control-active)] flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ubuntu-orange)]"
       >
         {isMaximized ? (
-          <Copy className="w-2 h-2 text-white/0 group-hover:text-white/80 transition-colors" />
+          <Copy className="w-2 h-2 opacity-0 group-hover:opacity-100 text-[var(--color-control-glyph)] transition-opacity" />
         ) : (
-          <Square className="w-2 h-2 text-white/0 group-hover:text-white/80 transition-colors" />
+          <Square className="w-2 h-2 opacity-0 group-hover:opacity-100 text-[var(--color-control-glyph)] transition-opacity" />
         )}
       </button>
 
@@ -48,9 +48,9 @@ export function WindowControls({
         type="button"
         onClick={onClose}
         aria-label="Close Window"
-        className="group relative w-3.5 h-3.5 rounded-full bg-[#484848] hover:bg-[var(--ubuntu-orange)] active:bg-[var(--ubuntu-orange-active)] flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white"
+        className="group relative w-3.5 h-3.5 rounded-full bg-[var(--color-control-bg)] hover:bg-[var(--ubuntu-orange)] active:bg-[var(--ubuntu-orange-active)] flex items-center justify-center transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-white"
       >
-        <X className="w-2.5 h-2.5 text-white/0 group-hover:text-white transition-colors" />
+        <X className="w-2.5 h-2.5 opacity-0 group-hover:opacity-100 text-white transition-opacity" />
       </button>
     </div>
   );

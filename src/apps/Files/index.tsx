@@ -54,11 +54,11 @@ export default function FilesApp() {
   };
 
   return (
-    <div className="h-full w-full flex bg-[#1E1E1E] text-white font-sans text-xs select-none">
+    <div className="h-full w-full flex bg-[var(--color-window-bg)] text-[var(--color-text-primary)] font-sans text-xs select-none">
       {/* Left Sidebar */}
-      <div className="w-36 sm:w-48 bg-[#181818] border-r border-white/10 p-3 space-y-4 shrink-0">
+      <div className="w-36 sm:w-48 bg-[var(--color-window-header)] border-r border-[var(--color-border-subtle)] p-3 space-y-4 shrink-0">
         <div className="space-y-1">
-          <span className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500 px-2 block">
+          <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)] px-2 block">
             Places
           </span>
           <button
@@ -67,7 +67,7 @@ export default function FilesApp() {
             className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-left transition-colors ${
               currentFolder === "home"
                 ? "bg-[var(--ubuntu-orange)] text-white font-semibold"
-                : "text-zinc-300 hover:bg-white/10"
+                : "text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-card-hover)]"
             }`}
           >
             <Home className="w-4 h-4" />
@@ -80,7 +80,7 @@ export default function FilesApp() {
             className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-left transition-colors ${
               currentFolder === "documents"
                 ? "bg-[var(--ubuntu-orange)] text-white font-semibold"
-                : "text-zinc-300 hover:bg-white/10"
+                : "text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-card-hover)]"
             }`}
           >
             <Folder className="w-4 h-4 text-amber-400" />
@@ -93,7 +93,7 @@ export default function FilesApp() {
             className={`w-full flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg text-left transition-colors ${
               currentFolder === "projects"
                 ? "bg-[var(--ubuntu-orange)] text-white font-semibold"
-                : "text-zinc-300 hover:bg-white/10"
+                : "text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-card-hover)]"
             }`}
           >
             <Folder className="w-4 h-4 text-amber-400" />
@@ -105,17 +105,17 @@ export default function FilesApp() {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Breadcrumb Path Bar */}
-        <div className="h-10 px-4 bg-[#252526] border-b border-white/5 flex items-center gap-2 text-zinc-400 text-xs">
-          <HardDrive className="w-4 h-4 text-zinc-400" />
+        <div className="h-10 px-4 bg-[var(--color-window-header-inactive)] border-b border-[var(--color-border-subtle)] flex items-center gap-2 text-[var(--color-text-secondary)] text-xs">
+          <HardDrive className="w-4 h-4 text-[var(--color-text-muted)]" />
           <button
             type="button"
             onClick={() => setCurrentFolder("home")}
-            className="hover:text-white transition-colors"
+            className="hover:text-[var(--color-text-primary)] transition-colors"
           >
             home
           </button>
-          <ChevronRight className="w-3.5 h-3.5 text-zinc-600" />
-          <span className="text-white font-medium capitalize">{currentFolder}</span>
+          <ChevronRight className="w-3.5 h-3.5 text-[var(--color-text-muted)]" />
+          <span className="text-[var(--color-text-primary)] font-medium capitalize">{currentFolder}</span>
         </div>
 
         {/* Files Grid */}
@@ -125,7 +125,7 @@ export default function FilesApp() {
               key={item.name}
               type="button"
               onClick={() => handleItemClick(item)}
-              className="p-4 rounded-xl hover:bg-white/10 active:bg-white/15 transition-all flex flex-col items-center text-center gap-2 group"
+              className="p-4 rounded-xl hover:bg-[var(--color-card-hover)] active:bg-[var(--color-card-active)] transition-all flex flex-col items-center text-center gap-2 group"
             >
               {item.type === "folder" ? (
                 <Folder className="w-12 h-12 text-amber-400 group-hover:scale-105 transition-transform" />
@@ -135,11 +135,11 @@ export default function FilesApp() {
                 <FileCode className="w-12 h-12 text-sky-400 group-hover:scale-105 transition-transform" />
               )}
               <div>
-                <span className="font-medium text-white block truncate max-w-[120px]">
+                <span className="font-medium text-[var(--color-text-primary)] block truncate max-w-[120px]">
                   {item.name}
                 </span>
                 {item.size && (
-                  <span className="text-[10px] text-zinc-500 block">{item.size}</span>
+                  <span className="text-[10px] text-[var(--color-text-muted)] block">{item.size}</span>
                 )}
               </div>
             </button>

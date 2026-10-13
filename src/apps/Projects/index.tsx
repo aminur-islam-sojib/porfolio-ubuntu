@@ -35,12 +35,12 @@ export default function ProjectsApp() {
   }, [selectedCategory, searchQuery]);
 
   return (
-    <div className="p-6 md:p-8 space-y-6 max-w-5xl mx-auto font-sans text-white select-text">
+    <div className="p-6 md:p-8 space-y-6 max-w-5xl mx-auto font-sans text-[var(--color-text-primary)] select-text">
       {/* Header and Controls */}
-      <div className="space-y-4 pb-4 border-b border-white/10">
+      <div className="space-y-4 pb-4 border-b border-[var(--color-border-subtle)]">
         <div>
           <h1 className="text-xl font-bold tracking-tight">Software Engineering Portfolio</h1>
-          <p className="text-xs text-zinc-400 mt-0.5">
+          <p className="text-xs text-[var(--color-text-muted)] mt-0.5">
             Full-stack web applications, telemedicine platforms, and responsive interfaces
           </p>
         </div>
@@ -48,7 +48,7 @@ export default function ProjectsApp() {
         {/* Filter controls bar */}
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
           {/* Category Tabs */}
-          <div className="flex items-center gap-1.5 p-1 rounded-lg bg-black/30 border border-white/5 w-fit max-w-full overflow-x-auto">
+          <div className="flex items-center gap-1.5 p-1 rounded-lg bg-[var(--color-input-bg)] border border-[var(--color-border-subtle)] w-fit max-w-full overflow-x-auto">
             {categories.map((cat) => (
               <button
                 key={cat.id}
@@ -57,7 +57,7 @@ export default function ProjectsApp() {
                 className={`px-3 py-1 rounded-[var(--control-radius)] text-xs font-medium transition-colors ${
                   selectedCategory === cat.id
                     ? "bg-[var(--ubuntu-orange)] text-white shadow-sm"
-                    : "text-zinc-400 hover:text-white hover:bg-white/5"
+                    : "text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-card-hover)]"
                 }`}
               >
                 {cat.label}
@@ -67,14 +67,14 @@ export default function ProjectsApp() {
 
           {/* Search Bar */}
           <div className="relative">
-            <Search className="w-3.5 h-3.5 text-zinc-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <Search className="w-3.5 h-3.5 text-[var(--color-text-muted)] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search tech or title..."
               aria-label="Search projects"
-              className="h-8 pl-8 pr-3 rounded-[var(--control-radius)] bg-black/40 border border-white/10 text-xs text-white placeholder-zinc-500 outline-none focus:border-[var(--ubuntu-orange)] transition-colors w-full sm:w-56"
+              className="h-8 pl-8 pr-3 rounded-[var(--control-radius)] bg-[var(--color-input-bg)] border border-[var(--color-input-border)] text-xs text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] outline-none focus:border-[var(--ubuntu-orange)] transition-colors w-full sm:w-56"
             />
           </div>
         </div>
@@ -82,7 +82,7 @@ export default function ProjectsApp() {
 
       {/* Projects Grid */}
       {filteredProjects.length === 0 ? (
-        <div className="p-12 text-center space-y-2 text-zinc-400">
+        <div className="p-12 text-center space-y-2 text-[var(--color-text-muted)]">
           <p className="text-sm">No projects matching your search filter.</p>
           <Button variant="ghost" size="sm" onClick={() => { setSearchQuery(""); setSelectedCategory("all"); }}>
             Clear Filters
@@ -93,12 +93,12 @@ export default function ProjectsApp() {
           {filteredProjects.map((project) => (
             <div
               key={project.id}
-              className="p-4 rounded-[var(--window-radius)] bg-white/5 border border-white/10 hover:border-white/20 transition-all flex flex-col justify-between space-y-4 group overflow-hidden"
+              className="p-4 rounded-[var(--window-radius)] bg-[var(--color-card-bg)] border border-[var(--color-border-subtle)] hover:border-[var(--ubuntu-orange)]/40 transition-all flex flex-col justify-between space-y-4 group overflow-hidden shadow-sm"
             >
               <div className="space-y-3">
                 {/* Project Screenshot / Thumbnail */}
                 {project.thumbnailUrl && (
-                  <div className="relative w-full h-44 rounded-xl overflow-hidden bg-black/40 border border-white/5">
+                  <div className="relative w-full h-44 rounded-xl overflow-hidden bg-[var(--color-input-bg)] border border-[var(--color-border-subtle)]">
                     <Image
                       src={project.thumbnailUrl}
                       alt={project.title}
@@ -106,7 +106,7 @@ export default function ProjectsApp() {
                       sizes="(max-width: 768px) 100vw, 500px"
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
                   </div>
                 )}
 
@@ -120,7 +120,7 @@ export default function ProjectsApp() {
                         href={project.githubUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="p-1.5 rounded hover:bg-white/10 text-zinc-400 hover:text-white transition-colors"
+                        className="p-1.5 rounded hover:bg-[var(--color-card-hover)] text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors"
                         aria-label="GitHub Repository"
                         title="GitHub Repository"
                       >
@@ -132,7 +132,7 @@ export default function ProjectsApp() {
                         href={project.liveUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="p-1.5 rounded hover:bg-white/10 text-zinc-400 hover:text-white transition-colors"
+                        className="p-1.5 rounded hover:bg-[var(--color-card-hover)] text-[var(--color-text-muted)] hover:text-[var(--color-text-primary)] transition-colors"
                         aria-label="Live Demo"
                         title="Live Site"
                       >
@@ -143,28 +143,28 @@ export default function ProjectsApp() {
                 </div>
 
                 <div className="space-y-1">
-                  <h2 className="text-base font-bold text-white group-hover:text-[var(--ubuntu-orange)] transition-colors">
+                  <h2 className="text-base font-bold text-[var(--color-text-primary)] group-hover:text-[var(--ubuntu-orange)] transition-colors">
                     {project.title}
                   </h2>
-                  <p className="text-xs text-zinc-300 leading-relaxed line-clamp-2">
+                  <p className="text-xs text-[var(--color-text-secondary)] leading-relaxed line-clamp-2">
                     {project.tagline}
                   </p>
                 </div>
               </div>
 
               {/* Technologies and Detail Button */}
-              <div className="space-y-3 pt-3 border-t border-white/5">
+              <div className="space-y-3 pt-3 border-t border-[var(--color-border-subtle)]">
                 <div className="flex flex-wrap gap-1.5">
                   {project.technologies.slice(0, 4).map((tech) => (
                     <span
                       key={tech}
-                      className="px-2 py-0.5 rounded text-[10px] font-medium bg-black/40 text-zinc-300 border border-white/5"
+                      className="px-2 py-0.5 rounded text-[10px] font-medium bg-[var(--color-input-bg)] text-[var(--color-text-secondary)] border border-[var(--color-border-subtle)]"
                     >
                       {tech}
                     </span>
                   ))}
                   {project.technologies.length > 4 && (
-                    <span className="px-1.5 py-0.5 rounded text-[10px] text-zinc-400">
+                    <span className="px-1.5 py-0.5 rounded text-[10px] text-[var(--color-text-muted)]">
                       +{project.technologies.length - 4} more
                     </span>
                   )}

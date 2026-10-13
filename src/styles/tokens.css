@@ -23,6 +23,20 @@
   --color-text-secondary: #b0b0b0;
   --color-text-muted: #7a7a7a;
 
+  --color-input-bg: rgba(0, 0, 0, 0.35);
+  --color-input-border: rgba(255, 255, 255, 0.12);
+
+  --color-control-bg: #484848;
+  --color-control-hover: #5a5a5a;
+  --color-control-active: #383838;
+  --color-control-glyph: rgba(255, 255, 255, 0.85);
+
+  /* Chrome App tokens (dark) */
+  --color-chrome-tabstrip: #202124;
+  --color-chrome-toolbar: #292a2d;
+  --color-chrome-omnibox: #202124;
+  --color-chrome-border: #35363a;
+
   /* Terminal Colors */
   --color-terminal-bg: #300a24;
   --color-terminal-text: #47d472;
@@ -60,14 +74,30 @@
   --color-window-bg: #fafafa;
   --color-window-header: #ebebeb;
   --color-window-header-inactive: #e0e0e0;
-  --color-card-bg: #f2f2f2;
-  --color-card-hover: #e8e8e8;
-  --color-card-active: #dedede;
-  --color-border-subtle: rgba(0, 0, 0, 0.1);
+  --color-card-bg: #ffffff;
+  --color-card-hover: #f0f0f0;
+  --color-card-active: #e4e4e4;
+  --color-border-subtle: rgba(0, 0, 0, 0.12);
   --color-border-focus: #e95420;
 
   --color-text-primary: #111111;
   --color-text-secondary: #4a4a4a;
-  --color-text-muted: #888888;
-}
+  --color-text-muted: #767676;
 
+  --color-input-bg: #ffffff;
+  --color-input-border: rgba(0, 0, 0, 0.15);
+
+  --color-control-bg: #cfcfcf;
+  --color-control-hover: #b8b8b8;
+  --color-control-active: #a5a5a5;
+  --color-control-glyph: rgba(0, 0, 0, 0.75);
+
+  /* Chrome App tokens (light) */
+  --color-chrome-tabstrip: #dee1e6;
+  --color-chrome-toolbar: #ffffff;
+  --color-chrome-omnibox: #f1f3f4;
+  --color-chrome-border: #dadce0;
+
+  --shadow-window: 0 14px 40px rgba(0, 0, 0, 0.16), 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-window-inactive: 0 6px 20px rgba(0, 0, 0, 0.12);
+}

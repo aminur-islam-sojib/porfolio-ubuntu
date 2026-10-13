@@ -150,14 +150,14 @@ export const Window = React.memo(function Window({ id, children }: WindowProps) 
         aria-label={win.title}
         onPointerDown={handlePointerDown}
         className={cn(
-          "h-full w-full flex flex-col overflow-hidden bg-[var(--color-window-bg)] border transition-shadow duration-200 select-auto animate-in fade-in zoom-in-[0.98] duration-150",
+          "h-full w-full flex flex-col overflow-hidden bg-[var(--color-window-bg)] border border-[var(--color-border-subtle)] transition-all duration-150 select-auto animate-in fade-in zoom-in-[0.98]",
           win.isMaximized
             ? "rounded-none border-none shadow-none"
             : win.snapZone !== "none"
-            ? "rounded-[6px] border-white/10"
-            : "rounded-[var(--window-radius)] border-white/10",
+            ? "rounded-[6px]"
+            : "rounded-[var(--window-radius)]",
           isFocused
-            ? "shadow-[var(--shadow-window)] ring-1 ring-white/10"
+            ? "shadow-[var(--shadow-window)] ring-1 ring-[var(--color-border-subtle)]"
             : "shadow-[var(--shadow-window-inactive)] opacity-95"
         )}
       >
@@ -174,7 +174,7 @@ export const Window = React.memo(function Window({ id, children }: WindowProps) 
         />
 
         {/* Window Content Container */}
-        <div className="flex-1 w-full overflow-y-auto overflow-x-hidden bg-[#1E1E1E] text-white">
+        <div className="flex-1 w-full overflow-y-auto overflow-x-hidden bg-[var(--color-window-bg)] text-[var(--color-text-primary)] transition-colors duration-150">
           {children}
         </div>
       </div>
