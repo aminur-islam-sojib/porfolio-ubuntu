@@ -51,3 +51,4 @@ export function playUbuntuStartupChime(): void {
     console.debug("Audio playback skipped:", err);
   }
 }
+

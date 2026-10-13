@@ -7,6 +7,7 @@ import { Desktop } from "@/components/shell/Desktop";
 import { PhoneShell } from "@/components/mobile/PhoneShell";
 import { TabletShell } from "@/components/mobile/TabletShell";
 import { DeepLinkHandler } from "@/components/shell/DeepLinkHandler";
+import { FullscreenPrompt } from "@/components/shell/FullscreenPrompt";
 import { useSystemStore } from "@/store/system";
 
 export function AppShell() {
@@ -35,6 +36,7 @@ export function AppShell() {
   return (
     <>
       <DeepLinkHandler />
+      <FullscreenPrompt />
       {mode === null ? (
         <div className="fixed inset-0 bg-[#111111] overflow-hidden select-none">
           <Wallpaper />

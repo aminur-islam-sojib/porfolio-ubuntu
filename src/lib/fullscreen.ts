@@ -117,3 +117,4 @@ function subscribe(callback: () => void) {
 export function useIsFullscreen(): boolean {
   return useSyncExternalStore(subscribe, getIsFullscreen, () => false);
 }
+
