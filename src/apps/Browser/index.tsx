@@ -1,40 +1,198 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import {
   ArrowLeft,
   ArrowRight,
   RotateCw,
   Home,
   Lock,
+  Plus,
+  X,
   ExternalLink,
+  Star,
+  MoreVertical,
   Globe,
-  AlertTriangle,
+  FileText,
+  Monitor,
 } from "lucide-react";
-import { Button } from "@/components/ui/Button";
+import { profileData } from "@/data/profile";
+import { ChromeNewTab } from "@/apps/Browser/ChromeNewTab";
+import { GoogleSearchPage } from "@/apps/Browser/GoogleSearchPage";
+import { ExternalPreviewCard } from "@/apps/Browser/ExternalPreviewCard";
+
+export interface ChromeTab {
+  id: string;
+  title: string;
+  url: string;
+  history: string[];
+  historyIndex: number;
+}
+
+function getTabTitle(url: string): string {
+  if (url === "chrome://newtab" || url === "about:blank") return "New Tab";
+  if (url.includes("google.com/search")) {
+    try {
+      const u = new URL(url);
+      const q = u.searchParams.get("q");
+      return q ? `${q} - Google Search` : "Google Search";
+    } catch {
+      return "Google Search";
+    }
+  }
+  if (url.includes("sojibahmed.vercel.app")) return "Sojib Ahmed — Portfolio";
+  if (url.includes("shifa-medi.vercel.app")) return "Shifa — Telemedicine";
+  if (url.includes("mess-manager")) return "Mess Manager";
+  if (url.includes("aabohawax")) return "AabohawaX — Weather";
+  if (url.includes("github.com")) return "GitHub · aminur-islam-sojib";
+  if (url.includes("linkedin.com")) return "LinkedIn · Aminur Islam Sojib";
+  if (url.includes("Sojib_Ahmed_Resume.pdf")) return "Resume — Sojib Ahmed";
+  if (url.includes("/classic")) return "Classic Portfolio";
+  try {
+    const host = new URL(url).hostname.replace(/^www\./, "");
+    return host;
+  } catch {
+    return url;
+  }
+}
 
 export default function BrowserApp() {
-  const [url, setUrl] = React.useState("https://en.wikipedia.org/wiki/Ubuntu");
-  const [inputUrl, setInputUrl] = React.useState(url);
-  const [iframeKey, setIframeKey] = React.useState(0);
-  const [hasFrameError, setHasFrameError] = React.useState(false);
+  const [tabs, setTabs] = React.useState<ChromeTab[]>([
+    {
+      id: "tab-1",
+      title: "New Tab",
+      url: "chrome://newtab",
+      history: ["chrome://newtab"],
+      historyIndex: 0,
+    },
+    {
+      id: "tab-2",
+      title: "Sojib Ahmed — Portfolio",
+      url: "https://sojibahmed.vercel.app",
+      history: ["https://sojibahmed.vercel.app"],
+      historyIndex: 0,
+    },
+  ]);
 
-  const bookmarks = [
-    { label: "Ubuntu", url: "https://en.wikipedia.org/wiki/Ubuntu" },
-    { label: "React", url: "https://react.dev" },
-    { label: "Next.js", url: "https://nextjs.org" },
-    { label: "GitHub", url: "https://github.com" },
-  ];
+  const [activeTabId, setActiveTabId] = React.useState<string>("tab-1");
+  const [editingUrl, setEditingUrl] = React.useState<string | null>(null);
+  const [iframeKey, setIframeKey] = React.useState(0);
+  const [iframeFailed, setIframeFailed] = React.useState<Record<string, boolean>>({});
+  const tabCounterRef = React.useRef(3);
+
+  const activeTab = tabs.find((t) => t.id === activeTabId) || tabs[0];
+  const inputUrl = editingUrl ?? (activeTab?.url || "chrome://newtab");
 
   const handleNavigate = (targetUrl: string) => {
     let formatted = targetUrl.trim();
-    if (!formatted.startsWith("http://") && !formatted.startsWith("https://")) {
-      formatted = `https://${formatted}`;
+    if (!formatted) return;
+
+    if (
+      !formatted.startsWith("http://") &&
+      !formatted.startsWith("https://") &&
+      !formatted.startsWith("chrome://") &&
+      !formatted.startsWith("/")
+    ) {
+      if (formatted.includes(".") && !formatted.includes(" ")) {
+        formatted = `https://${formatted}`;
+      } else {
+        formatted = `https://www.google.com/search?q=${encodeURIComponent(formatted)}`;
+      }
     }
-    setUrl(formatted);
-    setInputUrl(formatted);
-    setIframeKey((prev) => prev + 1);
-    setHasFrameError(false);
+
+    const title = getTabTitle(formatted);
+
+    setTabs((prev) =>
+      prev.map((tab) => {
+        if (tab.id !== activeTabId) return tab;
+        const newHistory = tab.history.slice(0, tab.historyIndex + 1);
+        newHistory.push(formatted);
+        return {
+          ...tab,
+          title,
+          url: formatted,
+          history: newHistory,
+          historyIndex: newHistory.length - 1,
+        };
+      })
+    );
+
+    setEditingUrl(null);
+    setIframeKey((k) => k + 1);
+  };
+
+  const handleAddTab = (initialUrl = "chrome://newtab") => {
+    const newId = `tab-${tabCounterRef.current++}`;
+    const newTab: ChromeTab = {
+      id: newId,
+      title: getTabTitle(initialUrl),
+      url: initialUrl,
+      history: [initialUrl],
+      historyIndex: 0,
+    };
+    setTabs((prev) => [...prev, newTab]);
+    setActiveTabId(newId);
+    setEditingUrl(null);
+  };
+
+  const handleCloseTab = (idToClose: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+
+    if (tabs.length === 1) {
+      const resetId = `tab-${tabCounterRef.current++}`;
+      // If closing the only tab, reset it to New Tab
+      setTabs([
+        {
+          id: resetId,
+          title: "New Tab",
+          url: "chrome://newtab",
+          history: ["chrome://newtab"],
+          historyIndex: 0,
+        },
+      ]);
+      setActiveTabId(resetId);
+      setEditingUrl(null);
+      return;
+    }
+
+    const indexToClose = tabs.findIndex((t) => t.id === idToClose);
+    const newTabs = tabs.filter((t) => t.id !== idToClose);
+    setTabs(newTabs);
+
+    if (activeTabId === idToClose) {
+      const nextActive = newTabs[Math.max(0, indexToClose - 1)] || newTabs[0];
+      setActiveTabId(nextActive.id);
+      setEditingUrl(null);
+    }
+  };
+
+  const handleGoBack = () => {
+    if (!activeTab || activeTab.historyIndex <= 0) return;
+    const newIndex = activeTab.historyIndex - 1;
+    const prevUrl = activeTab.history[newIndex];
+    setTabs((prev) =>
+      prev.map((t) =>
+        t.id === activeTab.id
+          ? { ...t, historyIndex: newIndex, url: prevUrl, title: getTabTitle(prevUrl) }
+          : t
+      )
+    );
+    setEditingUrl(null);
+  };
+
+  const handleGoForward = () => {
+    if (!activeTab || activeTab.historyIndex >= activeTab.history.length - 1) return;
+    const newIndex = activeTab.historyIndex + 1;
+    const nextUrl = activeTab.history[newIndex];
+    setTabs((prev) =>
+      prev.map((t) =>
+        t.id === activeTab.id
+          ? { ...t, historyIndex: newIndex, url: nextUrl, title: getTabTitle(nextUrl) }
+          : t
+      )
+    );
+    setEditingUrl(null);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -43,22 +201,102 @@ export default function BrowserApp() {
     }
   };
 
+  const bookmarks = [
+    { label: "Sojib Ahmed", url: "https://sojibahmed.vercel.app", icon: Globe },
+    { label: "Shifa", url: "https://shifa-medi.vercel.app", icon: Globe },
+    { label: "Mess Manager", url: "https://mess-manager-prod.vercel.app/", icon: Globe },
+    { label: "AabohawaX", url: "https://aabohawax.netlify.app", icon: Globe },
+    { label: "GitHub", url: "https://github.com/aminur-islam-sojib", icon: Globe },
+    { label: "LinkedIn", url: "https://linkedin.com/in/aminur-islam-sojib/", icon: Globe },
+    { label: "Resume PDF", url: profileData.resumeUrl, icon: FileText },
+    { label: "Classic View", url: "/classic", icon: Monitor },
+  ];
+
+  const isSearchQuery =
+    activeTab &&
+    (activeTab.url.includes("google.com/search") || activeTab.url.startsWith("https://www.google.com/search"));
+
+  const parsedQuery = React.useMemo(() => {
+    if (!isSearchQuery) return "";
+    try {
+      const u = new URL(activeTab.url);
+      return u.searchParams.get("q") || "";
+    } catch {
+      return "";
+    }
+  }, [isSearchQuery, activeTab]);
+
+  const isExternalRestricted =
+    activeTab &&
+    (activeTab.url.includes("github.com") ||
+      activeTab.url.includes("linkedin.com") ||
+      Boolean(iframeFailed[activeTab.id]));
+
   return (
-    <div className="h-full w-full flex flex-col bg-[#1E1E1E] text-white select-none">
-      {/* 1. Browser Navigation Bar */}
-      <div className="h-10 px-3 bg-[#2E2E2E] border-b border-white/10 flex items-center gap-2 text-xs">
-        <div className="flex items-center gap-1 text-zinc-400">
+    <div className="h-full w-full flex flex-col bg-[#202124] text-white select-none font-sans overflow-hidden">
+      {/* 1. Chrome Tab Strip */}
+      <div className="h-10 bg-[#202124] px-2 pt-1 flex items-end gap-1 overflow-x-auto border-b border-[#35363a] scrollbar-none">
+        {tabs.map((tab) => {
+          const isActive = tab.id === activeTabId;
+          return (
+            <div
+              key={tab.id}
+              onClick={() => setActiveTabId(tab.id)}
+              className={`group relative flex items-center justify-between gap-2 max-w-[210px] min-w-[120px] h-9 px-3 rounded-t-lg transition-colors cursor-pointer select-none text-xs border-t border-x ${
+                isActive
+                  ? "bg-[#292a2d] text-white font-medium border-white/10 shadow-sm"
+                  : "bg-transparent text-zinc-400 hover:bg-[#28292c] hover:text-zinc-200 border-transparent"
+              }`}
+            >
+              <div className="flex items-center gap-2 min-w-0 flex-1">
+                <Globe className="w-3.5 h-3.5 text-[var(--ubuntu-orange)] shrink-0" />
+                <span className="truncate text-xs">{tab.title}</span>
+              </div>
+
+              <button
+                type="button"
+                onClick={(e) => handleCloseTab(tab.id, e)}
+                aria-label={`Close tab ${tab.title}`}
+                className="p-1 rounded-full opacity-60 group-hover:opacity-100 hover:bg-white/20 text-zinc-300 hover:text-white transition-opacity"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </div>
+          );
+        })}
+
+        {/* Add Tab Button */}
+        <button
+          type="button"
+          onClick={() => handleAddTab()}
+          aria-label="New tab"
+          className="p-2 mb-1 rounded-full hover:bg-white/10 text-zinc-400 hover:text-white transition-colors"
+          title="New tab"
+        >
+          <Plus className="w-4 h-4" />
+        </button>
+      </div>
+
+      {/* 2. Chrome Navigation Toolbar */}
+      <div className="h-11 px-3 bg-[#292a2d] flex items-center gap-2 text-xs border-b border-[#35363a]">
+        <div className="flex items-center gap-0.5 text-zinc-400">
           <button
             type="button"
+            onClick={handleGoBack}
+            disabled={!activeTab || activeTab.historyIndex <= 0}
             aria-label="Back"
-            className="p-1 rounded hover:bg-white/10 hover:text-white transition-colors"
+            className="p-1.5 rounded-full hover:bg-white/10 hover:text-white disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+            title="Click to go back"
           >
             <ArrowLeft className="w-4 h-4" />
           </button>
           <button
             type="button"
+            onClick={handleGoForward}
+            disabled={!activeTab || activeTab.historyIndex >= activeTab.history.length - 1}
             aria-label="Forward"
-            className="p-1 rounded hover:bg-white/10 hover:text-white transition-colors"
+            className="p-1.5 rounded-full hover:bg-white/10 hover:text-white disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+            title="Click to go forward"
           >
             <ArrowRight className="w-4 h-4" />
           </button>
@@ -66,85 +304,108 @@ export default function BrowserApp() {
             type="button"
             onClick={() => setIframeKey((prev) => prev + 1)}
             aria-label="Reload"
-            className="p-1 rounded hover:bg-white/10 hover:text-white transition-colors"
+            className="p-1.5 rounded-full hover:bg-white/10 hover:text-white transition-colors"
+            title="Reload this page"
           >
             <RotateCw className="w-3.5 h-3.5" />
           </button>
           <button
             type="button"
-            onClick={() => handleNavigate("https://en.wikipedia.org/wiki/Ubuntu")}
+            onClick={() => handleNavigate("chrome://newtab")}
             aria-label="Home"
-            className="p-1 rounded hover:bg-white/10 hover:text-white transition-colors"
+            className="p-1.5 rounded-full hover:bg-white/10 hover:text-white transition-colors"
+            title="Open the homepage"
           >
             <Home className="w-4 h-4" />
           </button>
         </div>
 
-        {/* URL Input Bar */}
-        <div className="flex-1 flex items-center gap-2 h-7 px-3 rounded-full bg-black/40 border border-white/10 text-xs">
+        {/* Omnibox (Search / URL Bar) */}
+        <div className="flex-1 flex items-center gap-2 h-8 px-3.5 rounded-full bg-[#202124] border border-white/10 focus-within:border-white/20 text-xs shadow-inner">
           <Lock className="w-3 h-3 text-emerald-400 shrink-0" />
           <input
             type="text"
             value={inputUrl}
-            onChange={(e) => setInputUrl(e.target.value)}
+            onChange={(e) => setEditingUrl(e.target.value)}
             onKeyDown={handleKeyDown}
-            aria-label="Address bar"
-            className="w-full bg-transparent text-white outline-none border-none text-xs font-mono"
+            aria-label="Search or enter URL"
+            placeholder="Search Google or type a URL"
+            className="w-full bg-transparent text-white outline-none border-none text-xs font-mono placeholder-zinc-500"
           />
+          <Star className="w-3.5 h-3.5 text-zinc-500 hover:text-amber-400 cursor-pointer shrink-0 transition-colors" />
         </div>
 
-        {/* Open in external tab action */}
-        <a
-          href={url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="p-1.5 rounded hover:bg-white/10 text-zinc-300 hover:text-[var(--ubuntu-orange)] transition-colors flex items-center gap-1 text-xs"
-          title="Open in external browser tab"
-        >
-          <ExternalLink className="w-4 h-4" />
-        </a>
+        {/* Right Chrome Actions */}
+        <div className="flex items-center gap-1.5 pl-1">
+          {/* External browser open link */}
+          {activeTab.url !== "chrome://newtab" && (
+            <a
+              href={activeTab.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="p-1.5 rounded-full hover:bg-white/10 text-zinc-400 hover:text-[var(--ubuntu-orange)] transition-colors"
+              title="Open current page in system browser"
+            >
+              <ExternalLink className="w-4 h-4" />
+            </a>
+          )}
+
+          {/* Profile Avatar */}
+          <div
+            className="relative w-6 h-6 rounded-full overflow-hidden border border-white/20 shrink-0 cursor-pointer"
+            title={`Signed in as ${profileData.name} (${profileData.email})`}
+          >
+            <Image
+              src={profileData.avatarUrl}
+              alt={profileData.name}
+              fill
+              sizes="24px"
+              className="object-cover"
+            />
+          </div>
+
+          <button
+            type="button"
+            aria-label="Customize and control Google Chrome"
+            className="p-1 rounded-full hover:bg-white/10 text-zinc-400 hover:text-white"
+          >
+            <MoreVertical className="w-4 h-4" />
+          </button>
+        </div>
       </div>
 
-      {/* 2. Bookmarks Bar */}
-      <div className="h-7 px-4 bg-[#242424] border-b border-white/5 flex items-center gap-4 text-[11px] text-zinc-400">
+      {/* 3. Bookmarks Bar */}
+      <div className="h-7 px-3 bg-[#292a2d] border-b border-[#35363a] flex items-center gap-3 text-[11px] text-zinc-400 overflow-x-auto scrollbar-none">
         {bookmarks.map((bm) => (
           <button
             key={bm.label}
             type="button"
             onClick={() => handleNavigate(bm.url)}
-            className="flex items-center gap-1.5 hover:text-white transition-colors"
+            className="flex items-center gap-1.5 px-2 py-0.5 rounded hover:bg-white/10 hover:text-white transition-colors shrink-0"
           >
-            <Globe className="w-3 h-3 text-[var(--ubuntu-orange)]" />
+            <bm.icon className="w-3 h-3 text-[var(--ubuntu-orange)]" />
             <span>{bm.label}</span>
           </button>
         ))}
       </div>
 
-      {/* 3. Browser Viewport Area with Blocked Frame Fallback */}
-      <div className="flex-1 relative w-full h-full bg-white">
-        {hasFrameError ? (
-          <div className="absolute inset-0 bg-[#1E1E1E] flex flex-col items-center justify-center p-8 text-center text-white space-y-4">
-            <AlertTriangle className="w-12 h-12 text-amber-400" />
-            <div className="space-y-1">
-              <h2 className="text-base font-bold">Content Blocked by External Security Policy</h2>
-              <p className="text-xs text-zinc-400 max-w-md">
-                This website prevents display in browser iframes via <code>X-Frame-Options</code> or CSP.
-              </p>
-            </div>
-            <a href={url} target="_blank" rel="noopener noreferrer">
-              <Button variant="primary" size="md" className="gap-2">
-                <span>Open in New Browser Tab</span>
-                <ExternalLink className="w-4 h-4" />
-              </Button>
-            </a>
-          </div>
+      {/* 4. Active Tab Content Viewport */}
+      <div className="flex-1 relative w-full h-full bg-[#202124]">
+        {activeTab.url === "chrome://newtab" || activeTab.url === "about:blank" ? (
+          <ChromeNewTab onNavigate={handleNavigate} />
+        ) : isSearchQuery ? (
+          <GoogleSearchPage query={parsedQuery} onNavigate={handleNavigate} />
+        ) : isExternalRestricted ? (
+          <ExternalPreviewCard url={activeTab.url} />
         ) : (
           <iframe
-            key={iframeKey}
-            src={url}
-            title="Embedded Web Browser"
+            key={`${activeTab.id}-${iframeKey}`}
+            src={activeTab.url}
+            title={activeTab.title}
             sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-            onError={() => setHasFrameError(true)}
+            onError={() => {
+              setIframeFailed((prev) => ({ ...prev, [activeTab.id]: true }));
+            }}
             className="w-full h-full border-none bg-white"
           />
         )}
@@ -152,4 +413,3 @@ export default function BrowserApp() {
     </div>
   );
 }
-
