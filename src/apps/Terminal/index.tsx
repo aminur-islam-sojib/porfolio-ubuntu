@@ -166,49 +166,40 @@ export default function TerminalApp() {
             />
           </div>
 
-          {/* Quick Command Pills for Touch & Mobile Devices */}
+          {/* Quick Command Pills for Touch & Mobile Devices (5-6 suggestions) */}
           <div className="flex items-center gap-1.5 pt-3 overflow-x-auto select-none border-t border-white/5">
             {[
               "game 🚀",
+              "petsay",
               "neofetch",
-              "catsay",
-              "pet",
-              "catfacts",
-              "oneko",
-              "lolcat catsay",
               "skills",
               "projects",
-              "cowsay",
               "clear",
             ].map((qCmd) => (
               <button
                 key={qCmd}
                 type="button"
                 onClick={() => {
-                  if (qCmd === "game 🚀") {
+                  const cmdToRun = qCmd.startsWith("game") ? "game" : qCmd;
+                  if (cmdToRun === "game") {
                     const res = executeCommand("game");
                     setEntries((prev) => [...prev, { cmd: "game", output: res.output }]);
                     setCommandHistory((prev) => [...prev, "game"]);
                     setIsGameActive(true);
                     return;
                   }
-                  if (qCmd === "clear") {
+                  if (cmdToRun === "clear") {
                     setEntries([]);
                     return;
                   }
-                  const res = executeCommand(qCmd);
-                  if (res.action === "game") {
-                    setEntries((prev) => [...prev, { cmd: qCmd, output: res.output }]);
-                    setIsGameActive(true);
-                    return;
-                  }
-                  setEntries((prev) => [...prev, { cmd: qCmd, output: res.output }]);
-                  setCommandHistory((prev) => [...prev, qCmd]);
+                  const res = executeCommand(cmdToRun);
+                  setEntries((prev) => [...prev, { cmd: cmdToRun, output: res.output }]);
+                  setCommandHistory((prev) => [...prev, cmdToRun]);
                 }}
-                className={`px-2 py-0.5 rounded text-[11px] border transition-colors whitespace-nowrap ${
-                  qCmd === "game 🚀"
-                    ? "bg-[var(--ubuntu-orange)]/20 hover:bg-[var(--ubuntu-orange)]/35 text-[var(--ubuntu-orange)] font-bold border-[var(--ubuntu-orange)]/40"
-                    : "bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white border-white/10"
+                className={`px-2.5 py-1 rounded text-[11px] border transition-colors whitespace-nowrap  ${
+                  qCmd.startsWith("game")
+                    ? "bg-(--ubuntu-orange)/20 hover:bg-(--ubuntu-orange)/35 text-(--ubuntu-orange) font-bold border-(--ubuntu-orange)/40"
+                    : "bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white border-white/10 "
                 }`}
               >
                 {qCmd}

@@ -16,6 +16,7 @@ export const AVAILABLE_COMMANDS = [
   "cat",
   "catsay",
   "meowsay",
+  "petsay",
   "pet",
   "petcat",
   "catfacts",
@@ -252,8 +253,9 @@ function executeSingleCommand(rawCommand: string): CommandResult {
           "  theme <dark|light> Switch between dark and light themes",
           "",
           "Cat & Fun Utilities (I Love Cat Suite):",
-          "  catsay <text>     Cat speech bubble (flags: -s sleep, -b bongo, -p purr, -d dead)",
-          "  meowsay <text>    Alias for catsay",
+          "  petsay <text>     Pet speech bubble (flags: -s sleep, -b bongo, -p purr, -d dead)",
+          "  catsay <text>     Alias for petsay",
+          "  meowsay <text>    Alias for petsay",
           "  pet / petcat      Pet the desktop terminal cat & receive purrs",
           "  catfacts          Fascinating developer & feline trivia",
           "  lolcat <text>     Colorize terminal text in vibrant rainbow gradients",
@@ -331,6 +333,7 @@ function executeSingleCommand(rawCommand: string): CommandResult {
       return { output: `cat: ${args[0]}: No such file or directory` };
     }
 
+    case "petsay":
     case "catsay":
     case "meowsay":
       return { output: executeCatsay(args) };
@@ -505,7 +508,7 @@ export function executeCommand(rawCommand: string): CommandResult {
       const stage = parts[i].toLowerCase();
       if (stage.startsWith("lolcat")) {
         output = applyLolcat(output);
-      } else if (stage.startsWith("catsay") || stage.startsWith("meowsay")) {
+      } else if (stage.startsWith("petsay") || stage.startsWith("catsay") || stage.startsWith("meowsay")) {
         output = executeCatsay([output]);
       } else if (stage.startsWith("cowsay")) {
         const border = "-".repeat(output.length + 4);
