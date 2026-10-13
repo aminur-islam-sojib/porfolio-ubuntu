@@ -1,11 +1,13 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
-import { ArrowRight, Wifi, Volume2, Power, UserCheck, Shield } from "lucide-react";
+import Image from "next/image";
+import { Wifi, Volume2, Battery, Fingerprint } from "lucide-react";
 import { useSystemStore } from "@/store/system";
+import { UBUNTU_WALLPAPERS } from "@/data/wallpapers";
 import { profileData } from "@/data/profile";
-import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { playUbuntuStartupChime } from "@/lib/audio";
+import { enterFullscreen } from "@/lib/fullscreen";
 
 function subscribeToClock(callback: () => void) {
   const timer = setInterval(callback, 1000);
@@ -23,169 +25,237 @@ function getLockTime(): string {
 
 function getLockDate(): string {
   const now = new Date();
-  return now.toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-  });
-}
-
-function getEmptySnapshot(): string {
-  return "";
+  const weekday = now.toLocaleDateString("en-US", { weekday: "long" });
+  const month = now.toLocaleDateString("en-US", { month: "long" });
+  const day = now.getDate();
+  return `${weekday} ${month} ${day}`;
 }
 
 export function LockScreen() {
   const isLocked = useSystemStore((state) => state.isLocked);
   const unlockScreen = useSystemStore((state) => state.unlockScreen);
-  const prefersReducedMotion = useReducedMotion();
+  const wallpaper = useSystemStore((state) => state.wallpaper);
+  const theme = useSystemStore((state) => state.theme);
+
+  const [mode, setMode] = React.useState<"shield" | "auth">("shield");
+  const [password, setPassword] = React.useState("");
+  const inputRef = React.useRef<HTMLInputElement>(null);
 
   const currentTime = React.useSyncExternalStore(
     subscribeToClock,
     getLockTime,
-    getEmptySnapshot
+    () => "06:32"
   );
 
   const currentDate = React.useSyncExternalStore(
     subscribeToClock,
     getLockDate,
-    getEmptySnapshot
+    () => "Tuesday October 13"
   );
 
-  const [password, setPassword] = React.useState("");
-  const inputRef = React.useRef<HTMLInputElement>(null);
+  // Resolve current wallpaper URL for blurred background reflection
+  const currentSrc = React.useMemo(() => {
+    if (!wallpaper || typeof wallpaper !== "string") {
+      return theme === "light"
+        ? "/wallpapers/noble-light.webp"
+        : "/wallpapers/noble-dark.webp";
+    }
 
+    const found = UBUNTU_WALLPAPERS.find((w) => w.id === wallpaper);
+    if (found) {
+      if (found.isDynamic) {
+        return theme === "light" ? found.lightSrc! : found.darkSrc!;
+      }
+      return found.src;
+    }
+
+    if (
+      wallpaper.startsWith("/") ||
+      wallpaper.startsWith("data:") ||
+      wallpaper.startsWith("http")
+    ) {
+      return wallpaper;
+    }
+
+    return theme === "light"
+      ? "/wallpapers/noble-light.webp"
+      : "/wallpapers/noble-dark.webp";
+  }, [wallpaper, theme]);
+
+  // Focus input when entering auth mode
+  React.useEffect(() => {
+    if (isLocked && mode === "auth") {
+      setTimeout(() => inputRef.current?.focus(), 80);
+    }
+  }, [isLocked, mode]);
+
+  // Keyboard navigation
   React.useEffect(() => {
     if (!isLocked) return;
 
-    // Focus input on lock
-    inputRef.current?.focus();
-
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Any Enter or Escape unlocks instantly
-      if (e.key === "Escape" || e.key === "Enter") {
+      // Toggle to auth screen on any key press from shield mode
+      if (mode === "shield") {
+        if (e.key === "F11") return;
         e.preventDefault();
-        unlockScreen();
+        setMode("auth");
+        return;
+      }
+
+      // If in auth screen, Escape returns to shield
+      if (mode === "auth" && e.key === "Escape") {
+        e.preventDefault();
+        setMode("shield");
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isLocked, unlockScreen]);
+  }, [isLocked, mode]);
 
   if (!isLocked) return null;
 
   const handleUnlock = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("ubuntu_unlocked", "true");
+    }
     unlockScreen();
+    playUbuntuStartupChime();
+    enterFullscreen();
+
+    if (typeof window !== "undefined") {
+      const welcomeDismissed = localStorage.getItem("ubuntu_welcome_dismissed");
+      if (!welcomeDismissed) {
+        setTimeout(() => {
+          useSystemStore.getState().setWelcomeOpen(true);
+        }, 600);
+      }
+    }
+  };
+
+  const handleScreenClick = () => {
+    if (mode === "shield") {
+      setMode("auth");
+    }
   };
 
   return (
     <div
       role="dialog"
       aria-label="Ubuntu Lock Screen"
-      className={`fixed inset-0 z-[99995] flex flex-col justify-between bg-black/75 backdrop-blur-3xl text-white select-none ${
-        prefersReducedMotion ? "" : "animate-in fade-in duration-300"
-      }`}
+      onClick={handleScreenClick}
+      className="fixed inset-0 z-[99999] flex flex-col justify-between text-white select-none overflow-hidden"
     >
-      {/* Top Status Bar */}
-      <div className="h-8 px-4 flex items-center justify-between text-xs text-zinc-300 bg-black/20">
-        <span className="font-medium tracking-wide">Ubuntu 24.04 LTS</span>
-        <div className="flex items-center gap-3">
-          <Wifi className="w-3.5 h-3.5 text-zinc-300" />
-          <Volume2 className="w-3.5 h-3.5 text-zinc-300" />
-          <Power className="w-3.5 h-3.5 text-zinc-300" />
-        </div>
+      {/* 1. Underlying Blurred Wallpaper Background Reflection */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none select-none -z-10 bg-[#2C001E]">
+        {/* Base Fallback Gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#77216F] via-[#5E2750] to-[#2C001E]" />
+
+        {/* Wallpaper Image heavily blurred like Ubuntu GDM reflection */}
+        {currentSrc && (
+          <Image
+            src={currentSrc}
+            alt=""
+            fill
+            priority
+            unoptimized
+            sizes="100vw"
+            className="w-full h-full object-cover object-center scale-110 filter blur-3xl brightness-75 contrast-125 select-none"
+          />
+        )}
+
+        {/* Frosted dark vignette & glass overlay */}
+        <div className="absolute inset-0 bg-black/40 backdrop-blur-2xl" />
       </div>
 
-      {/* Main Lock Area */}
-      <div className="flex-1 flex flex-col items-center justify-center -mt-8 px-4">
-        {/* Clock & Date */}
-        <div className="text-center mb-8 space-y-1">
-          <div className="text-6xl sm:text-7xl font-light tracking-tight text-white/95 font-sans">
-            {currentTime || "20:00"}
-          </div>
-          <div className="text-sm sm:text-base text-zinc-300 font-medium">
-            {currentDate || "Monday, October 12"}
-          </div>
-        </div>
+      {/* 2. Top Status Bar (Minimal Right Glyphs) */}
+      <header className="fixed top-0 right-0 h-8 px-4 flex items-center gap-3 z-10 text-white/90 select-none">
+        <Wifi className="w-3.5 h-3.5" />
+        <Volume2 className="w-3.5 h-3.5" />
+        <Battery className="w-4 h-4" />
+      </header>
 
-        {/* User Card */}
-        <div className="w-full max-w-sm flex flex-col items-center space-y-5">
-          {/* Avatar */}
-          <div className="relative group">
-            <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-[#E95420] via-[#77216F] to-[#2C001E] p-1 shadow-2xl">
-              <div className="w-full h-full rounded-full bg-[#2C001E] flex items-center justify-center text-2xl font-bold text-white border border-white/20">
-                {profileData.name.charAt(0)}
+      {/* 3. Center Area */}
+      <main className="flex-1 flex flex-col items-center justify-center px-4 relative z-10">
+        {mode === "shield" ? (
+          /* ========================================================
+             Phase 1: Initial Lock Screen (Clock & Date Shield)
+             ======================================================== */
+          <div className="text-center space-y-2 cursor-pointer animate-in fade-in duration-300 select-none">
+            {/* Clock */}
+            <h1 className="text-7xl sm:text-8xl md:text-9xl font-light tracking-tight text-white font-sans select-none drop-shadow-md">
+              {currentTime}
+            </h1>
+
+            {/* Date */}
+            <p className="text-sm sm:text-base text-zinc-200 font-normal select-none pt-1">
+              {currentDate}
+            </p>
+
+            {/* Unlock Hint */}
+            <p className="text-xs text-[#ff8080] tracking-wide pt-8 select-none animate-pulse">
+              Click or press a key to unlock
+            </p>
+          </div>
+        ) : (
+          /* ========================================================
+             Phase 2: Password Authentication Screen
+             ======================================================== */
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="flex flex-col items-center text-center space-y-3.5 animate-in fade-in zoom-in-95 duration-200 select-none"
+          >
+            {/* Circular Avatar */}
+            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden border-2 border-white/20 shadow-2xl relative select-none">
+              <Image
+                src={profileData.avatarUrl || "/avatars/profile.png"}
+                alt={profileData.name}
+                fill
+                unoptimized
+                sizes="112px"
+                className="w-full h-full object-cover select-none"
+              />
+            </div>
+
+            {/* User Name */}
+            <h2 className="text-base font-semibold text-white tracking-wide select-none pt-1">
+              {profileData.name}
+            </h2>
+
+            {/* Password Input Pill */}
+            <form onSubmit={handleUnlock} className="w-64 sm:w-72 space-y-2 pt-1">
+              <div className="relative flex items-center">
+                <input
+                  ref={inputRef}
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Password"
+                  className="w-full h-9 pl-4 pr-9 rounded-full bg-[#3c2a38]/85 hover:bg-[#483344]/90 focus:bg-[#4c3547] border border-white/10 focus:border-[var(--ubuntu-orange)] text-xs text-white placeholder-zinc-400 outline-none transition-all shadow-inner"
+                />
+                <button
+                  type="submit"
+                  aria-label="Unlock"
+                  className="absolute right-2.5 text-zinc-400 hover:text-white transition-colors focus:outline-none"
+                >
+                  <Fingerprint className="w-4 h-4 text-zinc-400" />
+                </button>
               </div>
-            </div>
-            <div className="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-[var(--ubuntu-orange)] border-2 border-black flex items-center justify-center shadow">
-              <UserCheck className="w-3 h-3 text-white" />
-            </div>
+
+              {/* Reader Subtitle */}
+              <p className="text-[11px] text-[#ff8080] font-mono tracking-tight select-none">
+                (or place finger on reader)
+              </p>
+            </form>
+
+            {/* Recruiter / Quick Tip */}
+            <p className="text-[10px] text-zinc-400 select-none pt-2">
+              Press <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-zinc-300">Enter</kbd> to unlock • <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-zinc-300">Esc</kbd> to return
+            </p>
           </div>
-
-          {/* User Name & Role */}
-          <div className="text-center">
-            <h2 className="text-lg font-semibold text-white">{profileData.name}</h2>
-            <p className="text-xs text-zinc-400">{profileData.title}</p>
-          </div>
-
-          {/* Passwordless Unlock Form */}
-          <form
-            onSubmit={handleUnlock}
-            className="w-full relative flex items-center"
-          >
-            <input
-              ref={inputRef}
-              type="text"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Press Enter or click Unlock..."
-              className="w-full h-11 pl-4 pr-12 rounded-full bg-white/10 hover:bg-white/15 focus:bg-white/20 border border-white/20 focus:border-[var(--ubuntu-orange)] text-sm text-white placeholder-zinc-400 outline-none transition-all shadow-inner"
-            />
-            <button
-              type="submit"
-              aria-label="Unlock Desktop"
-              className="absolute right-1.5 w-8 h-8 rounded-full bg-[var(--ubuntu-orange)] hover:bg-[#ff6d38] active:scale-95 text-white flex items-center justify-center transition-transform shadow-md"
-            >
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </form>
-
-          {/* Recruiter notice */}
-          <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[11px]">
-            <Shield className="w-3 h-3" />
-            <span>Recruiter mode enabled • Passwordless instant access</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Bottom Footer Action Bar */}
-      <div className="py-4 px-6 flex items-center justify-between text-xs text-zinc-400 border-t border-white/5">
-        <button
-          type="button"
-          onClick={() => unlockScreen()}
-          className="hover:text-white transition-colors underline-offset-4 hover:underline"
-        >
-          Press Esc or Enter to unlock
-        </button>
-
-        <div className="flex items-center gap-4">
-          <Link
-            href="/classic"
-            className="hover:text-white transition-colors underline-offset-4 hover:underline"
-          >
-            Classic View
-          </Link>
-          <button
-            type="button"
-            onClick={() => useSystemStore.getState().reboot()}
-            className="hover:text-red-400 transition-colors"
-          >
-            Restart
-          </button>
-        </div>
-      </div>
+        )}
+      </main>
     </div>
   );
 }
-

@@ -27,15 +27,15 @@ export function Desktop() {
 
   const isBooting = useSystemStore((state) => state.isBooting);
 
-  // Check initial session boot, welcome status, and appearance preferences
+  // Check initial session boot, lock status, and appearance preferences
   React.useEffect(() => {
     const hasBooted = sessionStorage.getItem("ubuntu_booted");
     if (!hasBooted) {
       useSystemStore.setState({ isBooting: true });
     } else {
-      const welcomeDismissed = localStorage.getItem("ubuntu_welcome_dismissed");
-      if (!welcomeDismissed) {
-        useSystemStore.setState({ isWelcomeOpen: true });
+      const isUnlocked = sessionStorage.getItem("ubuntu_unlocked");
+      if (!isUnlocked) {
+        useSystemStore.setState({ isLocked: true });
       }
     }
 
@@ -59,9 +59,9 @@ export function Desktop() {
 
   const handleBootComplete = React.useCallback(() => {
     useSystemStore.getState().finishBoot();
-    const welcomeDismissed = localStorage.getItem("ubuntu_welcome_dismissed");
-    if (!welcomeDismissed) {
-      useSystemStore.getState().setWelcomeOpen(true);
+    const isUnlocked = sessionStorage.getItem("ubuntu_unlocked");
+    if (!isUnlocked) {
+      useSystemStore.setState({ isLocked: true });
     }
   }, []);
 
