@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useWindowStore } from "@/store/windows";
-import { useSystemStore } from "@/store/system";
+import { useSystemStore, SYSTEM_FONTS } from "@/store/system";
 import {
   Terminal,
   Settings,
@@ -13,6 +13,7 @@ import {
   FolderPlus,
   Maximize2,
   Minimize2,
+  Type,
 } from "lucide-react";
 import { useIsFullscreen, toggleFullscreen } from "@/lib/fullscreen";
 
@@ -25,6 +26,7 @@ export interface ContextMenuProps {
 export function ContextMenu({ x, y, onClose }: ContextMenuProps) {
   const menuRef = React.useRef<HTMLDivElement>(null);
   const theme = useSystemStore((state) => state.theme);
+  const font = useSystemStore((state) => state.font);
   const isFullscreen = useIsFullscreen();
 
   React.useEffect(() => {
@@ -149,6 +151,32 @@ export function ContextMenu({ x, y, onClose }: ContextMenuProps) {
           <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
         </span>
         <span className="text-[10px] text-[var(--color-text-muted)] capitalize">{theme}</span>
+      </button>
+
+      <button
+        type="button"
+        role="menuitem"
+        onClick={() =>
+          handleAction(() => {
+            const currentFont = useSystemStore.getState().font;
+            const currentIndex = SYSTEM_FONTS.findIndex((f) => f.id === currentFont);
+            const nextFont = SYSTEM_FONTS[(currentIndex + 1) % SYSTEM_FONTS.length];
+            useSystemStore.getState().setFont(nextFont.id);
+            useSystemStore.getState().addNotification({
+              title: "System Font Changed",
+              message: `Active font is now ${nextFont.name}`,
+            });
+          })
+        }
+        className="w-full px-3.5 py-1.5 flex items-center justify-between text-left hover:bg-[var(--ubuntu-orange)] hover:text-white transition-colors"
+      >
+        <span className="flex items-center gap-2.5">
+          <Type className="w-4 h-4 text-violet-400" />
+          <span>Switch Font</span>
+        </span>
+        <span className="text-[10px] text-[var(--color-text-muted)]">
+          {SYSTEM_FONTS.find((f) => f.id === font)?.name ?? "Ubuntu"}
+        </span>
       </button>
 
       <div className="my-1 border-t border-[var(--color-border-subtle)]" />

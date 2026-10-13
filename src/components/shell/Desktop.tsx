@@ -54,6 +54,11 @@ export function Desktop() {
       useSystemStore.getState().setAccentColor(savedAccent);
     }
 
+    const savedFont = localStorage.getItem("ubuntu_font") as import("@/store/system").SystemFontFamily | null;
+    if (savedFont) {
+      useSystemStore.getState().setFont(savedFont);
+    }
+
     const savedCustom = localStorage.getItem("ubuntu_custom_wallpapers");
     if (savedCustom) {
       try {

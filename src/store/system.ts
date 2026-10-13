@@ -8,8 +8,63 @@ export interface SystemNotification {
   timestamp: string;
 }
 
+export type SystemFontFamily = "ubuntu" | "inter" | "roboto" | "fira-sans" | "system";
+
+export interface SystemFontOption {
+  id: SystemFontFamily;
+  name: string;
+  category: string;
+  description: string;
+  sample: string;
+  fontFamily: string;
+}
+
+export const SYSTEM_FONTS: SystemFontOption[] = [
+  {
+    id: "ubuntu",
+    name: "Ubuntu",
+    category: "Canonical Yaru UI",
+    description: "Classic Ubuntu desktop identity with distinctive humanist curves",
+    sample: "Ubuntu Desktop 24.04 LTS (Noble Numbat)",
+    fontFamily: "var(--font-ubuntu), sans-serif",
+  },
+  {
+    id: "inter",
+    name: "Inter",
+    category: "Modern UI Sans",
+    description: "Highly legible geometric typeface optimized for developer interfaces",
+    sample: "Full-Stack Distributed Systems & Cloud Architecture",
+    fontFamily: "var(--font-inter), sans-serif",
+  },
+  {
+    id: "roboto",
+    name: "Roboto",
+    category: "Neo-Grotesque",
+    description: "Modern geometric curves with open, mechanical structure",
+    sample: "High-Performance Next.js & React Applications",
+    fontFamily: "var(--font-roboto), sans-serif",
+  },
+  {
+    id: "fira-sans",
+    name: "Fira Sans",
+    category: "Mozilla Open Source",
+    description: "Crisp open-source typeface tailored for Linux and high-DPI displays",
+    sample: "Fast, Resilient & Accessible Software Engineering",
+    fontFamily: "var(--font-fira-sans), sans-serif",
+  },
+  {
+    id: "system",
+    name: "System Default",
+    category: "Native Platform",
+    description: "Native operating system font stack (San Francisco / Segoe UI)",
+    sample: "Native Browser Engine & Web Shell",
+    fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+  },
+];
+
 interface SystemStoreState {
   theme: "dark" | "light";
+  font: SystemFontFamily;
   isBooting: boolean;
   isLocked: boolean;
   isWelcomeOpen: boolean;
@@ -27,6 +82,7 @@ interface SystemStoreState {
   // Actions
   setTheme: (theme: "dark" | "light") => void;
   toggleTheme: () => void;
+  setFont: (font: SystemFontFamily) => void;
   setWallpaper: (wallpaper: string) => void;
   setAccentColor: (accent: string) => void;
   addCustomWallpaper: (dataUrl: string) => void;
@@ -48,6 +104,7 @@ interface SystemStoreState {
 
 export const useSystemStore = create<SystemStoreState>((set, get) => ({
   theme: "dark",
+  font: "ubuntu",
   isBooting: false, // controlled by client mount on first load
   isLocked: false,
   isWelcomeOpen: false,
@@ -84,6 +141,14 @@ export const useSystemStore = create<SystemStoreState>((set, get) => ({
   toggleTheme: () => {
     const next = get().theme === "dark" ? "light" : "dark";
     get().setTheme(next);
+  },
+
+  setFont: (font) => {
+    if (typeof window !== "undefined") {
+      document.documentElement.setAttribute("data-font", font);
+      localStorage.setItem("ubuntu_font", font);
+    }
+    set({ font });
   },
 
   setWallpaper: (wallpaper) => {

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Ubuntu, Ubuntu_Mono } from "next/font/google";
+import { Ubuntu, Ubuntu_Mono, Inter, Roboto, Fira_Sans } from "next/font/google";
 import "./globals.css";
 
 const ubuntu = Ubuntu({
@@ -13,6 +13,27 @@ const ubuntuMono = Ubuntu_Mono({
   weight: ["400", "700"],
   subsets: ["latin"],
   variable: "--font-ubuntu-mono",
+  display: "swap",
+});
+
+const inter = Inter({
+  weight: ["300", "400", "500", "600", "700"],
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
+const roboto = Roboto({
+  weight: ["300", "400", "500", "700"],
+  subsets: ["latin"],
+  variable: "--font-roboto",
+  display: "swap",
+});
+
+const firaSans = Fira_Sans({
+  weight: ["300", "400", "500", "700"],
+  subsets: ["latin"],
+  variable: "--font-fira-sans",
   display: "swap",
 });
 
@@ -64,7 +85,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${ubuntu.variable} ${ubuntuMono.variable} h-full antialiased`}>
+    <html
+      lang="en"
+      className={`${ubuntu.variable} ${ubuntuMono.variable} ${inter.variable} ${roboto.variable} ${firaSans.variable} h-full antialiased`}
+    >
       <head>
         <JsonLd />
       </head>

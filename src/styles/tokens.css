@@ -121,3 +121,28 @@
   --shadow-window: 0 14px 40px rgba(0, 0, 0, 0.16), 0 2px 8px rgba(0, 0, 0, 0.08);
   --shadow-window-inactive: 0 6px 20px rgba(0, 0, 0, 0.12);
 }
+
+/* Font Family System Overrides */
+:root {
+  --font-system-ui: var(--font-ubuntu);
+}
+
+[data-font="ubuntu"] {
+  --font-system-ui: var(--font-ubuntu);
+}
+
+[data-font="inter"] {
+  --font-system-ui: var(--font-inter);
+}
+
+[data-font="roboto"] {
+  --font-system-ui: var(--font-roboto);
+}
+
+[data-font="fira-sans"] {
+  --font-system-ui: var(--font-fira-sans);
+}
+
+[data-font="system"] {
+  --font-system-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
