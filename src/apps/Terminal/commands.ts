@@ -7,6 +7,10 @@ import { useWindowStore } from "@/store/windows";
 export const AVAILABLE_COMMANDS = [
   "help",
   "neofetch",
+  "game",
+  "shooter",
+  "invaders",
+  "space-invaders",
   "skills",
   "projects",
   "cat",
@@ -202,7 +206,13 @@ function executeCatsay(args: string[]): string {
   return `${bubble}\n${cat}`;
 }
 
-function executeSingleCommand(rawCommand: string): { output: string; shouldClear?: boolean } {
+export interface CommandResult {
+  output: string;
+  shouldClear?: boolean;
+  action?: "game";
+}
+
+function executeSingleCommand(rawCommand: string): CommandResult {
   const trimmed = rawCommand.trim();
   if (!trimmed) return { output: "" };
 
@@ -210,6 +220,15 @@ function executeSingleCommand(rawCommand: string): { output: string; shouldClear
   const lowerCmd = cmd.toLowerCase();
 
   switch (lowerCmd) {
+    case "game":
+    case "shooter":
+    case "invaders":
+    case "space-invaders":
+      return {
+        output: "Starting Ubuntu Terminal Invaders (Space Shooter)...",
+        action: "game",
+      };
+
     case "clear":
       return { output: "", shouldClear: true };
 
@@ -217,6 +236,7 @@ function executeSingleCommand(rawCommand: string): { output: string; shouldClear
       return {
         output: [
           "Available terminal commands:",
+          "  game / shooter    Retro ASCII Space Invaders arcade shooter game (Alien Invaders)",
           "  neofetch          Display system specifications and Ubuntu banner",
           "  skills            List technical skills by engineering domain",
           "  projects          View portfolio projects with stack and links",
@@ -470,7 +490,7 @@ function executeSingleCommand(rawCommand: string): { output: string; shouldClear
   }
 }
 
-export function executeCommand(rawCommand: string): { output: string; shouldClear?: boolean } {
+export function executeCommand(rawCommand: string): CommandResult {
   const trimmed = rawCommand.trim();
   if (!trimmed) return { output: "" };
 
