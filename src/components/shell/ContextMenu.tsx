@@ -11,7 +11,10 @@ import {
   Sun,
   Moon,
   FolderPlus,
+  Maximize2,
+  Minimize2,
 } from "lucide-react";
+import { useIsFullscreen, toggleFullscreen } from "@/lib/fullscreen";
 
 export interface ContextMenuProps {
   x: number;
@@ -22,6 +25,7 @@ export interface ContextMenuProps {
 export function ContextMenu({ x, y, onClose }: ContextMenuProps) {
   const menuRef = React.useRef<HTMLDivElement>(null);
   const theme = useSystemStore((state) => state.theme);
+  const isFullscreen = useIsFullscreen();
 
   React.useEffect(() => {
     const handlePointerDown = (e: MouseEvent) => {
@@ -111,6 +115,23 @@ export function ContextMenu({ x, y, onClose }: ContextMenuProps) {
       >
         <Settings className="w-4 h-4 text-zinc-400" />
         <span>Display Settings</span>
+      </button>
+
+      <button
+        type="button"
+        role="menuitem"
+        onClick={() => handleAction(() => toggleFullscreen())}
+        className="w-full px-3.5 py-1.5 flex items-center justify-between text-left hover:bg-[var(--ubuntu-orange)] hover:text-white transition-colors"
+      >
+        <span className="flex items-center gap-2.5">
+          {isFullscreen ? (
+            <Minimize2 className="w-4 h-4 text-amber-400" />
+          ) : (
+            <Maximize2 className="w-4 h-4 text-amber-400" />
+          )}
+          <span>{isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}</span>
+        </span>
+        <span className="text-[10px] text-zinc-400">F11</span>
       </button>
 
       <button

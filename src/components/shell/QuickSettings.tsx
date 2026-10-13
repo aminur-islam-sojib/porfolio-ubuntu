@@ -15,10 +15,14 @@ import {
   Lock,
   Power,
   Eye,
+  Maximize2,
+  Minimize2,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
+import { useIsFullscreen, toggleFullscreen } from "@/lib/fullscreen";
 
 export function QuickSettings() {
+  const isFullscreen = useIsFullscreen();
   const isQuickSettingsOpen = useSystemStore((state) => state.isQuickSettingsOpen);
   const theme = useSystemStore((state) => state.theme);
   const volume = useSystemStore((state) => state.volume);
@@ -138,6 +142,30 @@ export function QuickSettings() {
             <span className="text-xs font-semibold block leading-tight">Night Light</span>
             <span className="text-[10px] text-zinc-400 block truncate">
               {nightLight ? "On" : "Off"}
+            </span>
+          </div>
+        </button>
+
+        {/* Fullscreen Pill */}
+        <button
+          type="button"
+          onClick={() => toggleFullscreen()}
+          className={cn(
+            "h-12 px-3 rounded-xl flex items-center gap-3 transition-colors text-left",
+            isFullscreen
+              ? "bg-[var(--ubuntu-orange)] text-white shadow-sm"
+              : "bg-white/10 hover:bg-white/15 text-zinc-200"
+          )}
+        >
+          {isFullscreen ? (
+            <Minimize2 className="w-5 h-5 shrink-0 text-white" />
+          ) : (
+            <Maximize2 className="w-5 h-5 shrink-0 text-amber-400" />
+          )}
+          <div className="truncate">
+            <span className="text-xs font-semibold block leading-tight">Fullscreen</span>
+            <span className="text-[10px] text-zinc-300 block truncate">
+              {isFullscreen ? "On (F11)" : "Off (F11)"}
             </span>
           </div>
         </button>

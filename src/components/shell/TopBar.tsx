@@ -1,9 +1,10 @@
 "use client";
 
 import * as React from "react";
-import { Wifi, Volume2, Power } from "lucide-react";
+import { Wifi, Volume2, Power, Maximize2, Minimize2 } from "lucide-react";
 import Link from "next/link";
 import { useSystemStore } from "@/store/system";
+import { useIsFullscreen, toggleFullscreen } from "@/lib/fullscreen";
 
 function subscribeToClock(callback: () => void) {
   const timer = setInterval(callback, 1000);
@@ -38,6 +39,7 @@ export function TopBar({
   onActivitiesClick,
   onQuickSettingsClick,
 }: TopBarProps) {
+  const isFullscreen = useIsFullscreen();
   const currentTime = React.useSyncExternalStore(
     subscribeToClock,
     getClockSnapshot,
@@ -88,7 +90,7 @@ export function TopBar({
         </button>
       </div>
 
-      {/* Right: Quick Settings Pill & Dev Link */}
+      {/* Right: Quick Settings Pill, Fullscreen Toggle & Dev Link */}
       <div className="flex items-center gap-1.5">
         <Link
           href="/dev/tokens"
@@ -97,6 +99,21 @@ export function TopBar({
         >
           Tokens
         </Link>
+
+        {/* Fullscreen Quick Toggle */}
+        <button
+          type="button"
+          onClick={() => toggleFullscreen()}
+          aria-label={isFullscreen ? "Exit Fullscreen (F11)" : "Enter Fullscreen (F11)"}
+          title={isFullscreen ? "Exit Fullscreen (F11)" : "Enter Fullscreen (F11)"}
+          className="h-[22px] px-2 rounded-full bg-white/5 hover:bg-white/15 active:bg-white/20 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ubuntu-orange)] flex items-center gap-1 text-zinc-300 hover:text-white"
+        >
+          {isFullscreen ? (
+            <Minimize2 className="w-3.5 h-3.5 text-[var(--ubuntu-orange)]" />
+          ) : (
+            <Maximize2 className="w-3.5 h-3.5 text-zinc-300" />
+          )}
+        </button>
 
         <button
           type="button"

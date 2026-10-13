@@ -3,10 +3,18 @@
 import * as React from "react";
 import { useWindowStore } from "@/store/windows";
 import { useSystemStore } from "@/store/system";
+import { toggleFullscreen } from "@/lib/fullscreen";
 
 export function useHotkeys() {
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Toggle Fullscreen with F11
+      if (e.key === "F11") {
+        e.preventDefault();
+        toggleFullscreen();
+        return;
+      }
+
       const system = useSystemStore.getState();
       if (system.isBooting || system.isLocked) {
         return;

@@ -7,6 +7,7 @@ import { useSystemStore } from "@/store/system";
 import { useWindowStore } from "@/store/windows";
 import { profileData } from "@/data/profile";
 import { useReducedMotion } from "@/hooks/useReducedMotion";
+import { enterFullscreen } from "@/lib/fullscreen";
 
 export function WelcomeModal() {
   const isWelcomeOpen = useSystemStore((state) => state.isWelcomeOpen);
@@ -15,6 +16,7 @@ export function WelcomeModal() {
   const [dontShowAgain, setDontShowAgain] = React.useState(true);
 
   const handleClose = React.useCallback(() => {
+    enterFullscreen();
     if (dontShowAgain && typeof window !== "undefined") {
       localStorage.setItem("ubuntu_welcome_dismissed", "true");
     }
