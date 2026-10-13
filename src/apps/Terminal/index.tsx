@@ -167,7 +167,7 @@ export default function TerminalApp() {
           </div>
 
           {/* Quick Command Pills for Touch & Mobile Devices (5-6 suggestions) */}
-          <div className="flex items-center gap-1.5 pt-3 overflow-x-auto select-none border-t border-white/5">
+          <div className="pt-3 border-t border-white/5 flex items-center gap-2 overflow-x-auto select-none w-full">
             {[
               "game 🚀",
               "petsay",
@@ -196,13 +196,15 @@ export default function TerminalApp() {
                   setEntries((prev) => [...prev, { cmd: cmdToRun, output: res.output }]);
                   setCommandHistory((prev) => [...prev, cmdToRun]);
                 }}
-                className={`px-2.5 py-1 rounded text-[11px] border transition-colors whitespace-nowrap  ${
+                className={`inline-flex items-center justify-center text-center leading-none px-3 py-1.5 rounded-md text-[11px] font-mono border transition-colors whitespace-nowrap shadow-xs ${
                   qCmd.startsWith("game")
-                    ? "bg-(--ubuntu-orange)/20 hover:bg-(--ubuntu-orange)/35 text-(--ubuntu-orange) font-bold border-(--ubuntu-orange)/40"
-                    : "bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white border-white/10 "
+                    ? "bg-[var(--ubuntu-orange)]/20 hover:bg-[var(--ubuntu-orange)]/35 text-[var(--ubuntu-orange)] font-bold border-[var(--ubuntu-orange)]/40"
+                    : "bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white border-white/10"
                 }`}
               >
-                {qCmd}
+                <span className="inline-flex items-center justify-center text-center leading-none">
+                  {qCmd}
+                </span>
               </button>
             ))}
           </div>

@@ -95,6 +95,7 @@ export function TerminalShooter({ onExit }: TerminalShooterProps) {
       right: false,
       fire: false,
     },
+    isPointerDown: false,
     lastFireTime: 0,
     wave: 1,
     score: 0,
@@ -219,6 +220,52 @@ export function TerminalShooter({ onExit }: TerminalShooterProps) {
     }
   }, []);
 
+  // Mouse / Pointer movement tracking to move fighter with mouse pointer
+  const updatePlayerPositionFromPointer = React.useCallback((clientX: number) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    if (rect.width <= 0) return;
+
+    const scaleX = canvas.width / rect.width;
+    const mouseCanvasX = (clientX - rect.left) * scaleX;
+    const g = gameRef.current;
+    const targetX = mouseCanvasX - g.player.width / 2;
+    g.player.x = Math.max(10, Math.min(g.canvasWidth - g.player.width - 10, targetX));
+  }, []);
+
+  const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    const g = gameRef.current;
+    updatePlayerPositionFromPointer(e.clientX);
+    if (gameState === "start" || gameState === "gameover" || gameState === "victory") {
+      startGame();
+    } else if (gameState === "playing") {
+      g.isPointerDown = true;
+      fireBullet();
+    }
+  };
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    updatePlayerPositionFromPointer(e.clientX);
+  };
+
+  const handlePointerUp = () => {
+    gameRef.current.isPointerDown = false;
+  };
+
+  const handlePointerLeave = () => {
+    gameRef.current.isPointerDown = false;
+  };
+
+  // Global pointer up listener to prevent stuck fire on drag outside
+  React.useEffect(() => {
+    const handleGlobalPointerUp = () => {
+      gameRef.current.isPointerDown = false;
+    };
+    window.addEventListener("pointerup", handleGlobalPointerUp);
+    return () => window.removeEventListener("pointerup", handleGlobalPointerUp);
+  }, []);
+
   // Keyboard controls listener
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -326,13 +373,18 @@ export function TerminalShooter({ onExit }: TerminalShooterProps) {
 
       if (g.state !== "playing") return;
 
-      // Player Movement
+      // Player Movement (Keyboard fallback)
       const playerSpeed = g.player.speedTimer > 0 ? 7 : 5;
       if (g.keys.left) {
         g.player.x = Math.max(10, g.player.x - playerSpeed);
       }
       if (g.keys.right) {
         g.player.x = Math.min(g.canvasWidth - g.player.width - 10, g.player.x + playerSpeed);
+      }
+
+      // Continuous firing while pointer is pressed down
+      if (g.isPointerDown) {
+        fireBullet();
       }
 
       // Timers decrement
@@ -352,37 +404,58 @@ export function TerminalShooter({ onExit }: TerminalShooterProps) {
           continue;
         }
 
-        // Bullet vs Bunker collision
-        let hitBunker = false;
-        for (const bunker of g.bunkers) {
-          if (
-            bunker.hp > 0 &&
-            b.x >= bunker.x &&
-            b.x <= bunker.x + 48 &&
-            b.y >= bunker.y &&
-            b.y <= bunker.y + 24
-          ) {
-            bunker.hp -= 1;
-            hitBunker = true;
-            spawnExplosion(b.x, b.y, "#887968");
-            break;
+        // Bullet vs Bunker collision (Ubuntu Firewalls)
+        // Friendly player bullets pass through our firewalls to attack hostile targets.
+        // Incoming hostile enemy lasers get absorbed and damage the firewall.
+        if (b.isEnemy) {
+          let hitBunker = false;
+          for (const bunker of g.bunkers) {
+            if (
+              bunker.hp > 0 &&
+              b.x >= bunker.x - 4 &&
+              b.x <= bunker.x + 52 &&
+              b.y >= bunker.y &&
+              b.y <= bunker.y + 26
+            ) {
+              bunker.hp -= 1;
+              hitBunker = true;
+              spawnExplosion(b.x, b.y, "#887968");
+              break;
+            }
+          }
+          if (hitBunker) {
+            g.bullets.splice(i, 1);
+            continue;
           }
         }
-        if (hitBunker) {
-          g.bullets.splice(i, 1);
-          continue;
-        }
 
-        // Player bullet vs Enemies
+        // Player bullet vs Enemies & UFO
         if (!b.isEnemy) {
           let hitEnemy = false;
-          for (const enemy of g.enemies) {
+
+          // Swept bullet bounding box so fast/diagonal bullets never tunnel through enemies
+          const bulletLeft = b.x - 6;
+          const bulletRight = b.x + 8;
+          const bulletTop = Math.min(b.y - 12, b.y - 12 + b.vy);
+          const bulletBottom = Math.max(b.y + 4, b.y + 4 - b.vy);
+
+          // Iterate bottom-to-top so frontmost enemies closest to the cannon get hit first
+          for (let eIdx = g.enemies.length - 1; eIdx >= 0; eIdx--) {
+            const enemy = g.enemies[eIdx];
+            if (!enemy.alive) continue;
+
+            // Enemy visual bounds (5 characters: ~42px wide, ~22px tall)
+            const enemyLeft = enemy.x - 2;
+            const enemyRight = enemy.x + 44;
+            const enemyTop = enemy.y;
+            const enemyBottom = enemy.y + 24;
+
+            // AABB Overlap check
             if (
-              enemy.alive &&
-              b.x >= enemy.x &&
-              b.x <= enemy.x + 36 &&
-              b.y >= enemy.y &&
-              b.y <= enemy.y + 22
+              bulletRight >= enemyLeft &&
+              bulletLeft <= enemyRight &&
+              bulletBottom >= enemyTop &&
+              bulletTop <= enemyBottom
             ) {
               enemy.alive = false;
               hitEnemy = true;
@@ -390,13 +463,13 @@ export function TerminalShooter({ onExit }: TerminalShooterProps) {
               setScore(g.score);
               saveHighScore(g.score);
 
-              spawnExplosion(enemy.x + 18, enemy.y + 11, "#E95420");
+              spawnExplosion(enemy.x + 20, enemy.y + 11, "#E95420");
 
-              // Chance of PowerUp drop (12%)
-              if (Math.random() < 0.12) {
+              // Chance of PowerUp drop (15%)
+              if (Math.random() < 0.15) {
                 const types: Array<"triple" | "speed" | "life"> = ["triple", "speed", "life"];
                 g.powerUps.push({
-                  x: enemy.x + 12,
+                  x: enemy.x + 16,
                   y: enemy.y + 10,
                   type: types[Math.floor(Math.random() * types.length)],
                   vy: 1.8,
@@ -406,18 +479,23 @@ export function TerminalShooter({ onExit }: TerminalShooterProps) {
             }
           }
 
-          // Player bullet vs UFO
+          // Player bullet vs UFO (Full 11-char sprite width ~88px)
           if (g.ufo && !hitEnemy) {
+            const ufoLeft = g.ufo.x - 4;
+            const ufoRight = g.ufo.x + 92;
+            const ufoTop = g.ufo.y;
+            const ufoBottom = g.ufo.y + 26;
+
             if (
-              b.x >= g.ufo.x &&
-              b.x <= g.ufo.x + 50 &&
-              b.y >= g.ufo.y &&
-              b.y <= g.ufo.y + 20
+              bulletRight >= ufoLeft &&
+              bulletLeft <= ufoRight &&
+              bulletBottom >= ufoTop &&
+              bulletTop <= ufoBottom
             ) {
               g.score += g.ufo.points;
               setScore(g.score);
               saveHighScore(g.score);
-              spawnExplosion(g.ufo.x + 25, g.ufo.y + 10, "#47D472");
+              spawnExplosion(g.ufo.x + 44, g.ufo.y + 12, "#47D472");
               g.ufo = null;
               hitEnemy = true;
             }
@@ -700,13 +778,13 @@ export function TerminalShooter({ onExit }: TerminalShooterProps) {
 
         ctx.fillStyle = "#B0B0B0";
         ctx.font = "12px 'Ubuntu Mono', monospace";
-        ctx.fillText("[A / D or ← / →] Move Spaceship", g.canvasWidth / 2, 210);
-        ctx.fillText("[SPACEBAR or ↑] Fire Dual Plasma", g.canvasWidth / 2, 235);
+        ctx.fillText("[Mouse Move or A / D / ← →] Move Spaceship", g.canvasWidth / 2, 210);
+        ctx.fillText("[Click or SPACEBAR] Fire Dual Plasma", g.canvasWidth / 2, 235);
         ctx.fillText("[P] Pause Game   •   [Q / ESC] Quit to Bash", g.canvasWidth / 2, 260);
 
         ctx.fillStyle = "#FFB86C";
         ctx.font = "bold 14px 'Ubuntu Mono', monospace";
-        ctx.fillText(">>> PRESS SPACEBAR OR CLICK START <<<", g.canvasWidth / 2, 320);
+        ctx.fillText(">>> MOVE MOUSE OR CLICK TO START <<<", g.canvasWidth / 2, 320);
         ctx.textAlign = "left";
       } else if (g.state === "paused") {
         ctx.fillStyle = "rgba(10, 0, 10, 0.75)";
@@ -752,7 +830,7 @@ export function TerminalShooter({ onExit }: TerminalShooterProps) {
 
     animId = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(animId);
-  }, [highScore, initLevel, saveHighScore]);
+  }, [fireBullet, highScore, initLevel, saveHighScore]);
 
   const toggleSound = () => {
     const muted = soundFx.toggleMute();
@@ -796,14 +874,12 @@ export function TerminalShooter({ onExit }: TerminalShooterProps) {
           ref={canvasRef}
           width={640}
           height={440}
-          className="w-full h-full max-h-[440px] aspect-[16/11] object-contain cursor-crosshair"
-          onClick={() => {
-            if (gameState === "start" || gameState === "gameover") {
-              startGame();
-            } else if (gameState === "playing") {
-              fireBullet();
-            }
-          }}
+          className="w-full h-full max-h-[440px] aspect-[16/11] object-contain cursor-crosshair touch-none"
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onPointerLeave={handlePointerLeave}
+          onPointerCancel={handlePointerUp}
         />
       </div>
 
@@ -866,7 +942,7 @@ export function TerminalShooter({ onExit }: TerminalShooterProps) {
           </button>
         ) : (
           <div className="hidden sm:block text-[11px] text-zinc-400">
-            [SPACE] Shoot • [A/D] Move • [P] Pause
+            [Mouse / A / D] Move • [Click / SPACE] Fire • [P] Pause
           </div>
         )}
 
