@@ -197,7 +197,7 @@ export function Activities() {
                       key={id}
                       type="button"
                       onClick={() => handleOpenApp(id)}
-                      className="w-56 h-36 rounded-xl bg-[var(--color-card-bg)] border border-[var(--color-border-subtle)] hover:border-[var(--ubuntu-orange)] hover:scale-105 transition-all shadow-xl p-3 flex flex-col justify-between text-left group"
+                      className="w-56 h-36 rounded-xl bg-[var(--color-popover-bg)]/90 border border-[var(--color-border-subtle)] hover:border-[var(--ubuntu-orange)] hover:scale-105 transition-all shadow-xl p-3 flex flex-col justify-between text-left group"
                     >
                       <div className="flex items-center gap-2">
                         <AppIcon id={id} size={20} className="shadow-none rounded-[4px]" />

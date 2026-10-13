@@ -86,7 +86,7 @@ export default function SettingsApp() {
   return (
     <div className="flex h-full w-full bg-[var(--color-window-bg)] text-[var(--color-text-primary)] font-sans select-none overflow-hidden">
       {/* 1. Left Sidebar */}
-      <aside className="w-56 shrink-0 bg-[var(--color-window-header)] border-r border-[var(--color-border-subtle)] flex flex-col h-full">
+      <aside className="w-56 shrink-0 bg-[var(--color-sidebar-bg)] border-r border-[var(--color-border-subtle)] flex flex-col h-full">
         {/* Search header */}
         <div className="p-3 border-b border-[var(--color-border-subtle)]">
           <div className="relative">

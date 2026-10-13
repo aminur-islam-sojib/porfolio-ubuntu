@@ -99,13 +99,13 @@ export function ChromeNewTab({ onNavigate }: ChromeNewTabProps) {
         {/* Search Omnibox */}
         <form onSubmit={handleSearchSubmit} className="w-full max-w-xl">
           <div className="relative group">
-            <Search className="w-5 h-5 text-[var(--color-text-muted)] absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none group-focus-within:text-[var(--ubuntu-orange)] transition-colors" />
+            <Search className="w-5 h-5 text-[var(--color-text-muted)] absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none group-focus-within:text-[var(--color-text-primary)] transition-colors" />
             <input
               type="text"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Search Google or type a URL"
-              className="w-full h-12 pl-12 pr-12 rounded-full bg-[var(--color-chrome-toolbar)] hover:border-[var(--ubuntu-orange)]/40 focus:border-[var(--ubuntu-orange)] text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] text-sm shadow-md border border-[var(--color-chrome-border)] outline-none transition-all"
+              className="w-full h-12 pl-12 pr-12 rounded-full bg-[var(--color-chrome-input)] hover:bg-[var(--color-chrome-input-hover)] text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] text-sm shadow-md border border-[var(--color-chrome-border)] focus:border-white/20 outline-none transition-all"
             />
             {searchInput && (
               <button
@@ -128,7 +128,7 @@ export function ChromeNewTab({ onNavigate }: ChromeNewTabProps) {
               onClick={() => onNavigate(sc.url)}
               className="flex flex-col items-center p-3 rounded-2xl hover:bg-[var(--color-card-hover)] transition-all group cursor-pointer"
             >
-              <div className="relative w-12 h-12 rounded-full bg-[var(--color-chrome-toolbar)] group-hover:scale-105 border border-[var(--color-chrome-border)] flex items-center justify-center overflow-hidden shadow-sm transition-transform mb-2">
+              <div className="relative w-12 h-12 rounded-full bg-[var(--color-chrome-input)] group-hover:scale-105 border border-[var(--color-chrome-border)] flex items-center justify-center overflow-hidden shadow-sm transition-transform mb-2">
                 {sc.image ? (
                   <Image
                     src={sc.image}

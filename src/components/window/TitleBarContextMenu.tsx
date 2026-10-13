@@ -48,7 +48,7 @@ export function TitleBarContextMenu({
       ref={menuRef}
       role="menu"
       style={{ left: x, top: y }}
-      className="fixed z-[99999] min-w-[170px] rounded-[var(--control-radius)] bg-[var(--color-card-bg)]/95 backdrop-blur-md border border-[var(--color-border-subtle)] shadow-[var(--shadow-popover)] py-1.5 text-xs text-[var(--color-text-primary)] select-none animate-in fade-in zoom-in-95 duration-100"
+      className="fixed z-[99999] min-w-[170px] rounded-[var(--control-radius)] bg-[var(--color-popover-bg)]/95 backdrop-blur-md border border-[var(--color-border-subtle)] shadow-[var(--shadow-popover)] py-1.5 text-xs text-[var(--color-text-primary)] select-none animate-in fade-in zoom-in-95 duration-100"
       onClick={(e) => e.stopPropagation()}
     >
       <button

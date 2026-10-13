@@ -74,7 +74,7 @@ export function QuickSettings() {
             "h-12 px-3 rounded-xl flex items-center gap-3 transition-colors text-left",
             theme === "light"
               ? "bg-[var(--ubuntu-orange)] text-white shadow-sm"
-              : "bg-[var(--color-input-bg)] hover:bg-[var(--color-card-hover)] border border-[var(--color-border-subtle)] text-[var(--color-text-primary)]"
+              : "bg-[var(--color-shell-tile-bg)] hover:bg-[var(--color-shell-tile-hover)] border border-[var(--color-border-subtle)] text-[var(--color-text-primary)]"
           )}
         >
           {theme === "light" ? (
@@ -99,7 +99,7 @@ export function QuickSettings() {
               message: "Connected to Wi-Fi: Ubuntu-HighSpeed-Mesh (5 GHz)",
             });
           }}
-          className="h-12 px-3 rounded-xl bg-[var(--color-input-bg)] hover:bg-[var(--color-card-hover)] border border-[var(--color-border-subtle)] text-[var(--color-text-primary)] flex items-center gap-3 transition-colors text-left"
+          className="h-12 px-3 rounded-xl bg-[var(--color-shell-tile-bg)] hover:bg-[var(--color-shell-tile-hover)] border border-[var(--color-border-subtle)] text-[var(--color-text-primary)] flex items-center gap-3 transition-colors text-left"
         >
           <Wifi className="w-5 h-5 shrink-0 text-[var(--ubuntu-orange)]" />
           <div className="truncate">
@@ -117,7 +117,7 @@ export function QuickSettings() {
               message: "Bluetooth active (Ready for wireless accessories)",
             });
           }}
-          className="h-12 px-3 rounded-xl bg-[var(--color-input-bg)] hover:bg-[var(--color-card-hover)] border border-[var(--color-border-subtle)] text-[var(--color-text-primary)] flex items-center gap-3 transition-colors text-left"
+          className="h-12 px-3 rounded-xl bg-[var(--color-shell-tile-bg)] hover:bg-[var(--color-shell-tile-hover)] border border-[var(--color-border-subtle)] text-[var(--color-text-primary)] flex items-center gap-3 transition-colors text-left"
         >
           <Bluetooth className="w-5 h-5 shrink-0 text-sky-400" />
           <div className="truncate">
@@ -134,7 +134,7 @@ export function QuickSettings() {
             "h-12 px-3 rounded-xl flex items-center gap-3 transition-colors text-left",
             nightLight
               ? "bg-amber-600/30 text-amber-500 border border-amber-500/40"
-              : "bg-[var(--color-input-bg)] hover:bg-[var(--color-card-hover)] border border-[var(--color-border-subtle)] text-[var(--color-text-primary)]"
+              : "bg-[var(--color-shell-tile-bg)] hover:bg-[var(--color-shell-tile-hover)] border border-[var(--color-border-subtle)] text-[var(--color-text-primary)]"
           )}
         >
           <Eye className="w-5 h-5 shrink-0" />
@@ -154,7 +154,7 @@ export function QuickSettings() {
             "h-12 px-3 rounded-xl flex items-center gap-3 transition-colors text-left",
             isFullscreen
               ? "bg-[var(--ubuntu-orange)] text-white shadow-sm"
-              : "bg-[var(--color-input-bg)] hover:bg-[var(--color-card-hover)] border border-[var(--color-border-subtle)] text-[var(--color-text-primary)]"
+              : "bg-[var(--color-shell-tile-bg)] hover:bg-[var(--color-shell-tile-hover)] border border-[var(--color-border-subtle)] text-[var(--color-text-primary)]"
           )}
         >
           {isFullscreen ? (

@@ -56,7 +56,7 @@ export default function FilesApp() {
   return (
     <div className="h-full w-full flex bg-[var(--color-window-bg)] text-[var(--color-text-primary)] font-sans text-xs select-none">
       {/* Left Sidebar */}
-      <div className="w-36 sm:w-48 bg-[var(--color-window-header)] border-r border-[var(--color-border-subtle)] p-3 space-y-4 shrink-0">
+      <div className="w-36 sm:w-48 bg-[var(--color-sidebar-bg)] border-r border-[var(--color-border-subtle)] p-3 space-y-4 shrink-0">
         <div className="space-y-1">
           <span className="text-[10px] font-semibold uppercase tracking-wider text-[var(--color-text-muted)] px-2 block">
             Places
@@ -105,7 +105,7 @@ export default function FilesApp() {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Breadcrumb Path Bar */}
-        <div className="h-10 px-4 bg-[var(--color-window-header-inactive)] border-b border-[var(--color-border-subtle)] flex items-center gap-2 text-[var(--color-text-secondary)] text-xs">
+        <div className="h-10 px-4 bg-[var(--color-subbar-bg)] border-b border-[var(--color-border-subtle)] flex items-center gap-2 text-[var(--color-text-secondary)] text-xs">
           <HardDrive className="w-4 h-4 text-[var(--color-text-muted)]" />
           <button
             type="button"

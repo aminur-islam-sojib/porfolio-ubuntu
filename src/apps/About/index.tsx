@@ -99,7 +99,7 @@ export default function AboutApp() {
         </div>
         <div className="p-3 rounded-xl bg-[var(--color-card-bg)] border border-[var(--color-border-subtle)] text-center shadow-xs">
           <span className="text-[11px] text-[var(--color-text-secondary)] block">Availability</span>
-          <span className="text-sm font-bold text-emerald-500">{profileData.metrics.support}</span>
+          <span className="text-sm font-bold text-emerald-400">{profileData.metrics.support}</span>
         </div>
       </div>
 
@@ -129,7 +129,7 @@ export default function AboutApp() {
           </div>
 
           <div className="p-3.5 rounded-xl bg-[var(--color-card-bg)] border border-[var(--color-border-subtle)] flex items-start gap-3 shadow-xs">
-            <HardDrive className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
+            <HardDrive className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
             <div>
               <span className="text-[var(--color-text-secondary)] block text-[11px]">Architecture & State</span>
               <span className="font-medium text-[var(--color-text-primary)]">{systemInfo.memory}</span>
@@ -137,7 +137,7 @@ export default function AboutApp() {
           </div>
 
           <div className="p-3.5 rounded-xl bg-[var(--color-card-bg)] border border-[var(--color-border-subtle)] flex items-start gap-3 shadow-xs">
-            <Monitor className="w-4 h-4 text-sky-500 shrink-0 mt-0.5" />
+            <Monitor className="w-4 h-4 text-sky-400 shrink-0 mt-0.5" />
             <div>
               <span className="text-[var(--color-text-secondary)] block text-[11px]">Operating System</span>
               <span className="font-medium text-[var(--color-text-primary)]">
@@ -147,7 +147,7 @@ export default function AboutApp() {
           </div>
 
           <div className="p-3.5 rounded-xl bg-[var(--color-card-bg)] border border-[var(--color-border-subtle)] flex items-start gap-3 shadow-xs">
-            <ShieldCheck className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
+            <ShieldCheck className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
             <div>
               <span className="text-[var(--color-text-secondary)] block text-[11px]">Kernel & Runtime</span>
               <span className="font-medium text-[var(--color-text-primary)]">{systemInfo.kernel}</span>

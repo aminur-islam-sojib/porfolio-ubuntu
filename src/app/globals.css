@@ -14,9 +14,16 @@
 
   --color-shell-bg: var(--color-shell-bg);
   --color-dock-bg: var(--color-dock-bg);
+  --color-shell-tile-bg: var(--color-shell-tile-bg);
+  --color-shell-tile-hover: var(--color-shell-tile-hover);
+
   --color-window-bg: var(--color-window-bg);
   --color-window-header: var(--color-window-header);
   --color-window-header-inactive: var(--color-window-header-inactive);
+  --color-sidebar-bg: var(--color-sidebar-bg);
+  --color-subbar-bg: var(--color-subbar-bg);
+  --color-popover-bg: var(--color-popover-bg);
+
   --color-card-bg: var(--color-card-bg);
   --color-card-hover: var(--color-card-hover);
   --color-card-active: var(--color-card-active);
@@ -26,6 +33,22 @@
   --color-text-primary: var(--color-text-primary);
   --color-text-secondary: var(--color-text-secondary);
   --color-text-muted: var(--color-text-muted);
+
+  --color-input-bg: var(--color-input-bg);
+  --color-input-border: var(--color-input-border);
+
+  --color-control-bg: var(--color-control-bg);
+  --color-control-hover: var(--color-control-hover);
+  --color-control-active: var(--color-control-active);
+  --color-control-glyph: var(--color-control-glyph);
+
+  --color-chrome-tabstrip: var(--color-chrome-tabstrip);
+  --color-chrome-toolbar: var(--color-chrome-toolbar);
+  --color-chrome-omnibox: var(--color-chrome-omnibox);
+  --color-chrome-border: var(--color-chrome-border);
+  --color-chrome-input: var(--color-chrome-input);
+  --color-chrome-input-hover: var(--color-chrome-input-hover);
+  --color-search-link: var(--color-search-link);
 
   --color-terminal-bg: var(--color-terminal-bg);
   --color-terminal-text: var(--color-terminal-text);

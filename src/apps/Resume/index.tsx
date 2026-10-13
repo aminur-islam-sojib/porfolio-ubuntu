@@ -148,7 +148,7 @@ export default function ResumeApp() {
           {/* Education History */}
           <div className="p-6 rounded-[var(--window-radius)] bg-[var(--color-card-bg)] border border-[var(--color-border-subtle)] space-y-4 shadow-xs">
             <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-secondary)] border-b border-[var(--color-border-subtle)] pb-2">
-              <GraduationCap className="w-4 h-4 text-emerald-500" />
+              <GraduationCap className="w-4 h-4 text-emerald-400" />
               <span>Education</span>
             </div>
 
