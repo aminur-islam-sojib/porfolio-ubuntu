@@ -8,9 +8,15 @@ import { useSystemStore } from "@/store/system";
 
 export function FullscreenPrompt() {
   const isFullscreen = useIsFullscreen();
+  const isBooting = useSystemStore((state) => state.isBooting);
+  const isLocked = useSystemStore((state) => state.isLocked);
   const [isOpen, setIsOpen] = React.useState(false);
 
   React.useEffect(() => {
+    if (isBooting || isLocked) {
+      return;
+    }
+
     // Check if user already dismissed or accepted in this session
     const hasDismissed = sessionStorage.getItem("ubuntu_fs_dismissed");
     if (!hasDismissed && !isFullscreen) {
@@ -20,7 +26,7 @@ export function FullscreenPrompt() {
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [isFullscreen]);
+  }, [isFullscreen, isBooting, isLocked]);
 
   const handleAccept = async () => {
     sessionStorage.setItem("ubuntu_fs_dismissed", "true");
