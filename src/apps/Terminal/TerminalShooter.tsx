@@ -19,8 +19,10 @@ interface Bullet {
 interface Enemy {
   x: number;
   y: number;
-  type: number; // 0, 1, 2
+  type: number; // 0: Grunt, 1: Elite, 2: Dreadnought (Boss)
   alive: boolean;
+  hp: number;
+  maxHp: number;
   points: number;
 }
 
@@ -35,10 +37,19 @@ interface Particle {
   maxLife: number;
 }
 
+interface FloatingText {
+  x: number;
+  y: number;
+  text: string;
+  color: string;
+  life: number;
+  maxLife: number;
+}
+
 interface PowerUp {
   x: number;
   y: number;
-  type: "triple" | "speed" | "life";
+  type: "triple" | "speed" | "life" | "shield";
   vy: number;
 }
 
@@ -51,7 +62,7 @@ interface Bunker {
 export function TerminalShooter({ onExit }: TerminalShooterProps) {
   const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
 
-  // High score from local storage (lazy initializer avoids effect setState)
+  // High score from local storage
   const [highScore, setHighScore] = React.useState<number>(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("ubuntu_terminal_shooter_high_score");
@@ -62,20 +73,21 @@ export function TerminalShooter({ onExit }: TerminalShooterProps) {
     }
     return 0;
   });
-  const [score, setScore] = React.useState<number>(0);
+
   const [gameState, setGameState] = React.useState<"start" | "playing" | "paused" | "gameover" | "victory">("start");
   const [isMuted, setIsMuted] = React.useState<boolean>(() => soundFx.getMuted());
 
-  // Mutable game state ref to avoid React state lag during 60fps loop
+  // Mutable game state ref to ensure 60fps performance without React re-render lag
   const gameRef = React.useRef({
     player: {
       x: 300,
-      y: 380,
-      width: 32,
-      height: 20,
-      speed: 5,
+      y: 395,
+      width: 36,
+      height: 22,
+      speed: 6,
       tripleShotTimer: 0,
       speedTimer: 0,
+      shieldTimer: 0,
       invulnerableTimer: 0,
     },
     bullets: [] as Bullet[],
@@ -87,6 +99,7 @@ export function TerminalShooter({ onExit }: TerminalShooterProps) {
     ufo: null as { x: number; y: number; speed: number; points: number } | null,
     ufoTimer: 0,
     particles: [] as Particle[],
+    floatingTexts: [] as FloatingText[],
     powerUps: [] as PowerUp[],
     bunkers: [] as Bunker[],
     stars: [] as { x: number; y: number; speed: number; char: string }[],
@@ -98,129 +111,186 @@ export function TerminalShooter({ onExit }: TerminalShooterProps) {
     isPointerDown: false,
     lastFireTime: 0,
     wave: 1,
+    waveBannerTimer: 0,
+    combo: {
+      count: 0,
+      timer: 0,
+    },
+    shakeTimer: 0,
     score: 0,
+    highScore: 0,
     lives: 3,
     state: "start" as "start" | "playing" | "paused" | "gameover" | "victory",
     canvasWidth: 640,
     canvasHeight: 440,
   });
 
-  const saveHighScore = React.useCallback((currentScore: number) => {
-    setHighScore((prev) => {
-      const newHigh = Math.max(prev, currentScore);
-      if (typeof window !== "undefined") {
-        localStorage.setItem("ubuntu_terminal_shooter_high_score", newHigh.toString());
-      }
-      return newHigh;
-    });
-  }, []);
+  // Sync high score to gameRef on mount
+  React.useEffect(() => {
+    gameRef.current.highScore = highScore;
+  }, [highScore]);
 
-  // Initialize stars and bunkers
-  const initLevel = React.useCallback((currentWave: number) => {
+  // Particle helper
+  const spawnExplosion = (x: number, y: number, color = "#FF6D3B", count = 14) => {
     const g = gameRef.current;
-    g.wave = currentWave;
+    const chars = ["*", "+", "#", "x", "•", "°"];
+    for (let i = 0; i < count; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 1.2 + Math.random() * 3.8;
+      g.particles.push({
+        x,
+        y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        char: chars[Math.floor(Math.random() * chars.length)],
+        color,
+        life: 18 + Math.random() * 16,
+        maxLife: 34,
+      });
+    }
+  };
 
-    // Stars
+  const spawnFloatingText = (x: number, y: number, text: string, color = "#FFB86C") => {
+    gameRef.current.floatingTexts.push({
+      x,
+      y,
+      text,
+      color,
+      life: 45,
+      maxLife: 45,
+    });
+  };
+
+  // Initialize stars once
+  const initStars = React.useCallback(() => {
+    const g = gameRef.current;
     if (g.stars.length === 0) {
-      g.stars = Array.from({ length: 45 }, () => ({
+      g.stars = Array.from({ length: 48 }, () => ({
         x: Math.random() * g.canvasWidth,
         y: Math.random() * g.canvasHeight,
-        speed: 0.2 + Math.random() * 0.8,
-        char: Math.random() > 0.7 ? "*" : Math.random() > 0.4 ? "+" : ".",
+        speed: 0.25 + Math.random() * 0.9,
+        char: Math.random() > 0.75 ? "*" : Math.random() > 0.4 ? "+" : ".",
       }));
     }
+  }, []);
 
-    // Enemies grid: 6 columns x 4 rows
+  // Initialize level and enemy fleet
+  const initLevel = React.useCallback((currentWave: number, isNewSession = false) => {
+    const g = gameRef.current;
+    g.wave = currentWave;
+    g.waveBannerTimer = 110; // 1.8s banner
+
     const cols = 6;
     const rows = 4;
-    const enemySpacingX = 52;
+    const enemySpacingX = 54;
     const enemySpacingY = 32;
     const startX = (g.canvasWidth - cols * enemySpacingX) / 2;
-    const startY = 60;
+    const startY = 65;
 
     const newEnemies: Enemy[] = [];
     for (let r = 0; r < rows; r++) {
       for (let c = 0; c < cols; c++) {
         let type = 0;
         let pts = 10;
+        let hp = 1;
         if (r === 0) {
-          type = 2; // Boss
+          type = 2; // Boss Dreadnought
           pts = 30;
+          hp = 2; // Takes 2 hits
         } else if (r === 1) {
-          type = 1; // Elite
+          type = 1; // Elite Invader
           pts = 20;
+          hp = 1;
         }
         newEnemies.push({
           x: startX + c * enemySpacingX,
           y: startY + r * enemySpacingY,
           type,
           alive: true,
+          hp,
+          maxHp: hp,
           points: pts,
         });
       }
     }
     g.enemies = newEnemies;
     g.enemyDirection = 1;
-    g.enemySpeed = 0.8 + currentWave * 0.25;
+    g.enemySpeed = 0.9 + currentWave * 0.22;
     g.bullets = [];
     g.powerUps = [];
 
-    // Bunkers: 3 positions
-    const bunkerCount = 3;
-    const bunkerWidth = 48;
-    const bunkerSpacing = (g.canvasWidth - bunkerCount * bunkerWidth) / (bunkerCount + 1);
-    g.bunkers = Array.from({ length: bunkerCount }, (_, i) => ({
-      x: bunkerSpacing * (i + 1) + bunkerWidth * i,
-      y: g.canvasHeight - 90,
-      hp: 12, // takes 12 hits
-    }));
+    // Bunkers (Ubuntu Defensive Firewalls)
+    if (isNewSession || g.bunkers.length === 0) {
+      const bunkerCount = 3;
+      const bunkerWidth = 48;
+      const bunkerSpacing = (g.canvasWidth - bunkerCount * bunkerWidth) / (bunkerCount + 1);
+      g.bunkers = Array.from({ length: bunkerCount }, (_, i) => ({
+        x: bunkerSpacing * (i + 1) + bunkerWidth * i,
+        y: g.canvasHeight - 95,
+        hp: 12,
+      }));
+    } else {
+      // Partial shield repair between waves
+      g.bunkers = g.bunkers.map((b) => ({
+        ...b,
+        hp: Math.min(12, b.hp + 4),
+      }));
+    }
 
-    g.player.x = g.canvasWidth / 2 - g.player.width / 2;
-    g.player.y = g.canvasHeight - 45;
+    // Only center player when beginning a brand new session, NOT on wave clear
+    if (isNewSession) {
+      g.player.x = g.canvasWidth / 2 - g.player.width / 2;
+      g.player.y = g.canvasHeight - 45;
+      g.player.tripleShotTimer = 0;
+      g.player.speedTimer = 0;
+      g.player.shieldTimer = 0;
+      g.player.invulnerableTimer = 0;
+      g.combo.count = 0;
+      g.combo.timer = 0;
+    }
   }, []);
 
   const startGame = React.useCallback(() => {
     const g = gameRef.current;
     g.score = 0;
     g.lives = 3;
-    setScore(0);
-    initLevel(1);
+    initLevel(1, true);
     g.state = "playing";
     setGameState("playing");
   }, [initLevel]);
 
-  // Handle player firing
+  // Handle player firing with twin plasma or triple spread
   const fireBullet = React.useCallback(() => {
     const g = gameRef.current;
     if (g.state !== "playing") return;
 
     const now = Date.now();
-    const cooldown = g.player.speedTimer > 0 ? 160 : 250;
+    const cooldown = g.player.speedTimer > 0 ? 140 : 220;
     if (now - g.lastFireTime < cooldown) return;
     g.lastFireTime = now;
 
     soundFx.playLaser();
 
+    // Muzzle flash particles
+    spawnExplosion(g.player.x + g.player.width / 2, g.player.y - 4, "#E95420", 3);
+
     if (g.player.tripleShotTimer > 0) {
-      // Triple spread
+      // Triple angled beam
       g.bullets.push(
-        { x: g.player.x + g.player.width / 2, y: g.player.y - 4, vx: 0, vy: -7, isEnemy: false },
-        { x: g.player.x + 4, y: g.player.y - 4, vx: -2, vy: -6.5, isEnemy: false },
-        { x: g.player.x + g.player.width - 4, y: g.player.y - 4, vx: 2, vy: -6.5, isEnemy: false }
+        { x: g.player.x + g.player.width / 2, y: g.player.y - 6, vx: 0, vy: -8, isEnemy: false },
+        { x: g.player.x + 4, y: g.player.y - 4, vx: -2.4, vy: -7.5, isEnemy: false },
+        { x: g.player.x + g.player.width - 4, y: g.player.y - 4, vx: 2.4, vy: -7.5, isEnemy: false }
       );
     } else {
-      // Standard twin beam
-      g.bullets.push({
-        x: g.player.x + g.player.width / 2,
-        y: g.player.y - 4,
-        vx: 0,
-        vy: -7,
-        isEnemy: false,
-      });
+      // Twin wingtip plasma bolts
+      g.bullets.push(
+        { x: g.player.x + 8, y: g.player.y - 4, vx: 0, vy: -8, isEnemy: false },
+        { x: g.player.x + g.player.width - 8, y: g.player.y - 4, vx: 0, vy: -8, isEnemy: false }
+      );
     }
   }, []);
 
-  // Mouse / Pointer movement tracking to move fighter with mouse pointer
+  // Smooth pointer tracking across canvas coordinate space
   const updatePlayerPositionFromPointer = React.useCallback((clientX: number) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -237,16 +307,18 @@ export function TerminalShooter({ onExit }: TerminalShooterProps) {
   const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
     const g = gameRef.current;
     updatePlayerPositionFromPointer(e.clientX);
-    if (gameState === "start" || gameState === "gameover" || gameState === "victory") {
+    if (g.state === "start" || g.state === "gameover" || g.state === "victory") {
       startGame();
-    } else if (gameState === "playing") {
+    } else if (g.state === "playing") {
       g.isPointerDown = true;
       fireBullet();
     }
   };
 
   const handlePointerMove = (e: React.PointerEvent<HTMLCanvasElement>) => {
-    updatePlayerPositionFromPointer(e.clientX);
+    if (gameRef.current.state === "playing") {
+      updatePlayerPositionFromPointer(e.clientX);
+    }
   };
 
   const handlePointerUp = () => {
@@ -257,14 +329,24 @@ export function TerminalShooter({ onExit }: TerminalShooterProps) {
     gameRef.current.isPointerDown = false;
   };
 
-  // Global pointer up listener to prevent stuck fire on drag outside
+  // Global window pointer listener so rapid swiping or dragging outside canvas tracks reliably
   React.useEffect(() => {
     const handleGlobalPointerUp = () => {
       gameRef.current.isPointerDown = false;
     };
+    const handleGlobalPointerMove = (e: PointerEvent) => {
+      if (gameRef.current.isPointerDown && gameRef.current.state === "playing") {
+        updatePlayerPositionFromPointer(e.clientX);
+      }
+    };
+
     window.addEventListener("pointerup", handleGlobalPointerUp);
-    return () => window.removeEventListener("pointerup", handleGlobalPointerUp);
-  }, []);
+    window.addEventListener("pointermove", handleGlobalPointerMove);
+    return () => {
+      window.removeEventListener("pointerup", handleGlobalPointerUp);
+      window.removeEventListener("pointermove", handleGlobalPointerMove);
+    };
+  }, [updatePlayerPositionFromPointer]);
 
   // Keyboard controls listener
   React.useEffect(() => {
@@ -285,6 +367,7 @@ export function TerminalShooter({ onExit }: TerminalShooterProps) {
         } else if (g.state === "start" || g.state === "gameover" || g.state === "victory") {
           startGame();
         } else if (g.state === "playing") {
+          g.keys.fire = true;
           fireBullet();
         }
       }
@@ -298,7 +381,6 @@ export function TerminalShooter({ onExit }: TerminalShooterProps) {
         }
       }
       if (e.key === "q" || e.key === "Q" || e.key === "Escape") {
-        saveHighScore(g.score);
         onExit(g.score);
       }
     };
@@ -311,6 +393,9 @@ export function TerminalShooter({ onExit }: TerminalShooterProps) {
       if (e.key === "ArrowRight" || e.key === "d" || e.key === "D") {
         g.keys.right = false;
       }
+      if (e.key === " " || e.key === "Spacebar" || e.key === "ArrowUp" || e.key === "w" || e.key === "W") {
+        g.keys.fire = false;
+      }
     };
 
     window.addEventListener("keydown", handleKeyDown);
@@ -319,9 +404,9 @@ export function TerminalShooter({ onExit }: TerminalShooterProps) {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
     };
-  }, [fireBullet, onExit, saveHighScore, startGame]);
+  }, [fireBullet, onExit, startGame]);
 
-  // Main 60FPS Game Loop
+  // Main 60FPS Game Loop — RUNS ONCE ON MOUNT TO PREVENT TEAR-DOWN RESETS
   React.useEffect(() => {
     let animId: number;
     const canvas = canvasRef.current;
@@ -329,27 +414,8 @@ export function TerminalShooter({ onExit }: TerminalShooterProps) {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    initLevel(1);
-
-    const spawnExplosion = (x: number, y: number, color = "#FF6D3B") => {
-      const g = gameRef.current;
-      soundFx.playExplosion();
-      const chars = ["*", "+", "#", "x", "•"];
-      for (let i = 0; i < 14; i++) {
-        const angle = Math.random() * Math.PI * 2;
-        const speed = 1 + Math.random() * 3.5;
-        g.particles.push({
-          x,
-          y,
-          vx: Math.cos(angle) * speed,
-          vy: Math.sin(angle) * speed,
-          char: chars[Math.floor(Math.random() * chars.length)],
-          color,
-          life: 20 + Math.random() * 15,
-          maxLife: 35,
-        });
-      }
-    };
+    initStars();
+    initLevel(1, true);
 
     const update = () => {
       const g = gameRef.current;
@@ -374,10 +440,33 @@ export function TerminalShooter({ onExit }: TerminalShooterProps) {
         }
       }
 
+      // 3. Update Floating Score Popups
+      for (let i = g.floatingTexts.length - 1; i >= 0; i--) {
+        const ft = g.floatingTexts[i];
+        ft.y -= 0.65;
+        ft.life -= 1;
+        if (ft.life <= 0) {
+          g.floatingTexts.splice(i, 1);
+        }
+      }
+
+      // 4. Update Combo Timer
+      if (g.combo.timer > 0) {
+        g.combo.timer -= 1;
+        if (g.combo.timer <= 0) {
+          g.combo.count = 0;
+        }
+      }
+
+      // Wave banner decrement
+      if (g.waveBannerTimer > 0) {
+        g.waveBannerTimer -= 1;
+      }
+
       if (g.state !== "playing") return;
 
       // Player Movement (Keyboard fallback)
-      const playerSpeed = g.player.speedTimer > 0 ? 7 : 5;
+      const playerSpeed = g.player.speedTimer > 0 ? 8 : 5.8;
       if (g.keys.left) {
         g.player.x = Math.max(10, g.player.x - playerSpeed);
       }
@@ -385,31 +474,30 @@ export function TerminalShooter({ onExit }: TerminalShooterProps) {
         g.player.x = Math.min(g.canvasWidth - g.player.width - 10, g.player.x + playerSpeed);
       }
 
-      // Continuous firing while pointer is pressed down
-      if (g.isPointerDown) {
+      // Auto-fire while mouse pointer or Space key is held down
+      if (g.isPointerDown || g.keys.fire) {
         fireBullet();
       }
 
-      // Timers decrement
+      // Buff timers
       if (g.player.tripleShotTimer > 0) g.player.tripleShotTimer--;
       if (g.player.speedTimer > 0) g.player.speedTimer--;
+      if (g.player.shieldTimer > 0) g.player.shieldTimer--;
       if (g.player.invulnerableTimer > 0) g.player.invulnerableTimer--;
 
-      // 3. Update Bullets
+      // 5. Update Bullets & Collisions
       for (let i = g.bullets.length - 1; i >= 0; i--) {
         const b = g.bullets[i];
         b.x += b.vx;
         b.y += b.vy;
 
-        // Out of bounds
-        if (b.y < 0 || b.y > g.canvasHeight) {
+        // Out of bounds check
+        if (b.y < -10 || b.y > g.canvasHeight + 10 || b.x < -10 || b.x > g.canvasWidth + 10) {
           g.bullets.splice(i, 1);
           continue;
         }
 
-        // Bullet vs Bunker collision (Ubuntu Firewalls)
-        // Friendly player bullets pass through our firewalls to attack hostile targets.
-        // Incoming hostile enemy lasers get absorbed and damage the firewall.
+        // Bullet vs Bunker (Ubuntu Defensive Firewalls)
         if (b.isEnemy) {
           let hitBunker = false;
           for (const bunker of g.bunkers) {
@@ -422,7 +510,8 @@ export function TerminalShooter({ onExit }: TerminalShooterProps) {
             ) {
               bunker.hp -= 1;
               hitBunker = true;
-              spawnExplosion(b.x, b.y, "#887968");
+              spawnExplosion(b.x, b.y, "#887968", 5);
+              soundFx.playHit();
               break;
             }
           }
@@ -432,84 +521,141 @@ export function TerminalShooter({ onExit }: TerminalShooterProps) {
           }
         }
 
-        // Player bullet vs Enemies & UFO
+        // Player bullet collisions
         if (!b.isEnemy) {
-          let hitEnemy = false;
+          let hit = false;
 
-          // Swept bullet bounding box so fast/diagonal bullets never tunnel through enemies
-          const bulletLeft = b.x - 6;
-          const bulletRight = b.x + 8;
-          const bulletTop = Math.min(b.y - 12, b.y - 12 + b.vy);
-          const bulletBottom = Math.max(b.y + 4, b.y + 4 - b.vy);
+          // Bullet vs Enemy Bullet Deflection (Shoot down incoming enemy lasers!)
+          for (let ebIdx = g.bullets.length - 1; ebIdx >= 0; ebIdx--) {
+            const eb = g.bullets[ebIdx];
+            if (!eb.isEnemy) continue;
 
-          // Iterate bottom-to-top so frontmost enemies closest to the cannon get hit first
+            if (Math.abs(b.x - eb.x) < 9 && Math.abs(b.y - eb.y) < 14) {
+              g.bullets.splice(ebIdx, 1);
+              hit = true;
+              spawnExplosion((b.x + eb.x) / 2, (b.y + eb.y) / 2, "#FFB86C", 7);
+              soundFx.playDeflect();
+              g.score += 5;
+              spawnFloatingText(b.x, b.y - 6, "+5 DEFLECT", "#50FA7B");
+              break;
+            }
+          }
+
+          if (hit) {
+            g.bullets.splice(i, 1);
+            continue;
+          }
+
+          // Player bullet vs Alien Invaders
           for (let eIdx = g.enemies.length - 1; eIdx >= 0; eIdx--) {
             const enemy = g.enemies[eIdx];
             if (!enemy.alive) continue;
 
-            // Enemy visual bounds (5 characters: ~42px wide, ~22px tall)
+            // Accurate AABB collision bounds with swept vertical box
             const enemyLeft = enemy.x - 2;
             const enemyRight = enemy.x + 44;
             const enemyTop = enemy.y;
             const enemyBottom = enemy.y + 24;
 
-            // AABB Overlap check
             if (
-              bulletRight >= enemyLeft &&
-              bulletLeft <= enemyRight &&
-              bulletBottom >= enemyTop &&
-              bulletTop <= enemyBottom
+              b.x + 5 >= enemyLeft &&
+              b.x - 5 <= enemyRight &&
+              b.y + 10 >= enemyTop &&
+              b.y - 12 <= enemyBottom
             ) {
-              enemy.alive = false;
-              hitEnemy = true;
-              g.score += enemy.points;
-              setScore(g.score);
-              saveHighScore(g.score);
+              hit = true;
+              enemy.hp -= 1;
 
-              spawnExplosion(enemy.x + 20, enemy.y + 11, "#E95420");
+              if (enemy.hp <= 0) {
+                // ENEMY DESTROYED!
+                enemy.alive = false;
 
-              // Chance of PowerUp drop (15%)
-              if (Math.random() < 0.15) {
-                const types: Array<"triple" | "speed" | "life"> = ["triple", "speed", "life"];
-                g.powerUps.push({
-                  x: enemy.x + 16,
-                  y: enemy.y + 10,
-                  type: types[Math.floor(Math.random() * types.length)],
-                  vy: 1.8,
-                });
+                // Combo multiplier calculation
+                g.combo.count++;
+                g.combo.timer = 130;
+                const mult = Math.min(4, 1 + Math.floor(g.combo.count / 3));
+                const earnedPoints = enemy.points * mult;
+                g.score += earnedPoints;
+
+                // Sync high score in memory & storage without triggering React re-render loops
+                if (g.score > g.highScore) {
+                  g.highScore = g.score;
+                  if (typeof window !== "undefined") {
+                    localStorage.setItem("ubuntu_terminal_shooter_high_score", g.highScore.toString());
+                  }
+                }
+
+                spawnFloatingText(
+                  enemy.x + 14,
+                  enemy.y - 4,
+                  `+${earnedPoints}${mult > 1 ? ` (x${mult})` : ""}`,
+                  enemy.type === 2 ? "#FF79C6" : enemy.type === 1 ? "#8BE9FD" : "#47D472"
+                );
+
+                spawnExplosion(
+                  enemy.x + 20,
+                  enemy.y + 11,
+                  enemy.type === 2 ? "#FF79C6" : enemy.type === 1 ? "#8BE9FD" : "#E95420",
+                  enemy.type === 2 ? 22 : 14
+                );
+                soundFx.playExplosion();
+
+                // Drop power-up chance (30% for Boss, 20% for Elite, 12% for Grunt)
+                const dropRate = enemy.type === 2 ? 0.35 : enemy.type === 1 ? 0.2 : 0.12;
+                if (Math.random() < dropRate) {
+                  const types: Array<"triple" | "speed" | "life" | "shield"> = ["triple", "speed", "life", "shield"];
+                  g.powerUps.push({
+                    x: enemy.x + 16,
+                    y: enemy.y + 10,
+                    type: types[Math.floor(Math.random() * types.length)],
+                    vy: 1.6,
+                  });
+                }
+              } else {
+                // Multi-HP boss damage flash
+                spawnExplosion(b.x, b.y, "#FFFFFF", 5);
+                soundFx.playHit();
               }
               break;
             }
           }
 
-          // Player bullet vs UFO (Full 11-char sprite width ~88px)
-          if (g.ufo && !hitEnemy) {
+          // Player bullet vs Bonus Mystery UFO
+          if (g.ufo && !hit) {
             const ufoLeft = g.ufo.x - 4;
             const ufoRight = g.ufo.x + 92;
             const ufoTop = g.ufo.y;
             const ufoBottom = g.ufo.y + 26;
 
             if (
-              bulletRight >= ufoLeft &&
-              bulletLeft <= ufoRight &&
-              bulletBottom >= ufoTop &&
-              bulletTop <= ufoBottom
+              b.x + 6 >= ufoLeft &&
+              b.x - 6 <= ufoRight &&
+              b.y + 8 >= ufoTop &&
+              b.y - 12 <= ufoBottom
             ) {
-              g.score += g.ufo.points;
-              setScore(g.score);
-              saveHighScore(g.score);
-              spawnExplosion(g.ufo.x + 44, g.ufo.y + 12, "#47D472");
+              hit = true;
+              const ufoPts = g.ufo.points;
+              g.score += ufoPts;
+              if (g.score > g.highScore) {
+                g.highScore = g.score;
+                if (typeof window !== "undefined") {
+                  localStorage.setItem("ubuntu_terminal_shooter_high_score", g.highScore.toString());
+                }
+              }
+
+              spawnFloatingText(g.ufo.x + 30, g.ufo.y - 4, `+${ufoPts} UFO BONUS!`, "#FF5555");
+              spawnExplosion(g.ufo.x + 44, g.ufo.y + 12, "#FF5555", 26);
+              soundFx.playExplosion();
               g.ufo = null;
-              hitEnemy = true;
             }
           }
 
-          if (hitEnemy) {
+          if (hit) {
             g.bullets.splice(i, 1);
             continue;
           }
         } else {
-          // Enemy bullet vs Player
+          // Enemy bullet vs Player Ship
           if (
             g.player.invulnerableTimer <= 0 &&
             b.x >= g.player.x &&
@@ -517,69 +663,96 @@ export function TerminalShooter({ onExit }: TerminalShooterProps) {
             b.y >= g.player.y &&
             b.y <= g.player.y + g.player.height
           ) {
-            g.lives -= 1;
-            soundFx.playHit();
-            spawnExplosion(g.player.x + 16, g.player.y + 10, "#DF382C");
-            g.player.invulnerableTimer = 90; // invulnerable for 1.5s
             g.bullets.splice(i, 1);
+            g.shakeTimer = 8; // Screen shake
 
-            if (g.lives <= 0) {
-              g.state = "gameover";
-              setGameState("gameover");
+            // If shield powerup is active, absorb the blow
+            if (g.player.shieldTimer > 0) {
+              g.player.shieldTimer = 0;
+              g.player.invulnerableTimer = 60;
+              spawnExplosion(g.player.x + 18, g.player.y + 11, "#8BE9FD", 18);
+              soundFx.playDeflect();
+              spawnFloatingText(g.player.x, g.player.y - 10, "SHIELD DEFLECT!", "#8BE9FD");
+            } else {
+              // Lost a heart
+              g.lives -= 1;
+              g.combo.count = 0; // Reset combo
+              soundFx.playHit();
+              spawnExplosion(g.player.x + 18, g.player.y + 11, "#DF382C", 20);
+              g.player.invulnerableTimer = 90; // 1.5s invulnerable
+
+              if (g.lives <= 0) {
+                g.state = "gameover";
+                setHighScore(g.highScore);
+                setGameState("gameover");
+              }
             }
             continue;
           }
         }
       }
 
-      // 4. Update PowerUps
+      // 6. Update PowerUps
       for (let i = g.powerUps.length - 1; i >= 0; i--) {
         const pu = g.powerUps[i];
         pu.y += pu.vy;
 
         // Catch powerup
         if (
-          pu.x + 12 >= g.player.x &&
+          pu.x + 14 >= g.player.x &&
           pu.x <= g.player.x + g.player.width &&
-          pu.y + 12 >= g.player.y &&
+          pu.y + 14 >= g.player.y &&
           pu.y <= g.player.y + g.player.height
         ) {
           soundFx.playPowerup();
-          if (pu.type === "triple") g.player.tripleShotTimer = 450; // 7.5 seconds
-          if (pu.type === "speed") g.player.speedTimer = 450;
-          if (pu.type === "life") {
+          if (pu.type === "triple") {
+            g.player.tripleShotTimer = 480; // 8 seconds
+            spawnFloatingText(g.player.x, g.player.y - 10, "TRIPLE PLASMA!", "#FFB86C");
+          } else if (pu.type === "speed") {
+            g.player.speedTimer = 480;
+            spawnFloatingText(g.player.x, g.player.y - 10, "OVERCLOCK SPEED!", "#50FA7B");
+          } else if (pu.type === "shield") {
+            g.player.shieldTimer = 600; // 10 seconds or until hit
+            spawnFloatingText(g.player.x, g.player.y - 10, "ENERGY SHIELD!", "#8BE9FD");
+          } else if (pu.type === "life") {
             g.lives = Math.min(5, g.lives + 1);
+            spawnFloatingText(g.player.x, g.player.y - 10, "+1 REPAIR HEART!", "#FF5555");
           }
           g.powerUps.splice(i, 1);
           continue;
         }
 
-        if (pu.y > g.canvasHeight) {
+        if (pu.y > g.canvasHeight + 10) {
           g.powerUps.splice(i, 1);
         }
       }
 
-      // 5. Update Enemies Movement
+      // 7. Update Enemies Fleet Movement
       const livingEnemies = g.enemies.filter((e) => e.alive);
 
-      // Check Victory Condition
+      // Check Wave Victory Condition
       if (livingEnemies.length === 0) {
+        soundFx.playVictory();
         g.score += 500 * g.wave;
-        setScore(g.score);
-        saveHighScore(g.score);
-        soundFx.playPowerup();
-        initLevel(g.wave + 1);
+        if (g.score > g.highScore) {
+          g.highScore = g.score;
+          if (typeof window !== "undefined") {
+            localStorage.setItem("ubuntu_terminal_shooter_high_score", g.highScore.toString());
+          }
+        }
+        spawnFloatingText(g.canvasWidth / 2 - 60, g.canvasHeight / 2, `WAVE CLEAR! +${500 * g.wave} PTS`, "#50FA7B");
+        initLevel(g.wave + 1, false);
         return;
       }
 
-      // Increase speed as enemies decrease
+      // Fleet speed increases as invader count decreases
       const remainingPct = livingEnemies.length / g.enemies.length;
-      const currentSpeed = (g.enemySpeed + (1 - remainingPct) * 1.6) * g.enemyDirection;
+      const currentSpeed = (g.enemySpeed + (1 - remainingPct) * 1.8) * g.enemyDirection;
 
       let edgeReached = false;
       for (const e of livingEnemies) {
         e.x += currentSpeed;
-        if (e.x < 15 || e.x + 36 > g.canvasWidth - 15) {
+        if (e.x < 15 || e.x + 40 > g.canvasWidth - 15) {
           edgeReached = true;
         }
       }
@@ -588,46 +761,48 @@ export function TerminalShooter({ onExit }: TerminalShooterProps) {
         g.enemyDirection *= -1;
         for (const e of livingEnemies) {
           e.y += 14;
-          // Check if enemies reached the player
+          // Check if invaders breached defensive perimeter
           if (e.y + 22 >= g.player.y) {
             g.lives = 0;
             g.state = "gameover";
+            setHighScore(g.highScore);
             setGameState("gameover");
           }
         }
       }
 
-      // 6. Enemy Random Shooting
+      // 8. Enemy Bombardment (Random Fire)
       g.enemyShootTimer++;
-      const shootInterval = Math.max(30, 75 - g.wave * 8);
+      const shootInterval = Math.max(26, 68 - g.wave * 7);
       if (g.enemyShootTimer > shootInterval) {
         g.enemyShootTimer = 0;
         const shooter = livingEnemies[Math.floor(Math.random() * livingEnemies.length)];
         if (shooter) {
           g.bullets.push({
-            x: shooter.x + 18,
+            x: shooter.x + 20,
             y: shooter.y + 20,
-            vx: (Math.random() - 0.5) * 0.8,
-            vy: 3.5 + g.wave * 0.4,
+            vx: (Math.random() - 0.5) * 0.9,
+            vy: 3.6 + g.wave * 0.35,
             isEnemy: true,
           });
         }
       }
 
-      // 7. Update UFO
+      // 9. Update Mystery UFO
       g.ufoTimer++;
-      if (!g.ufo && g.ufoTimer > 600) {
+      if (!g.ufo && g.ufoTimer > 650) {
         g.ufoTimer = 0;
         g.ufo = {
-          x: -60,
-          y: 28,
-          speed: 2.2,
+          x: -90,
+          y: 30,
+          speed: 2.3,
           points: 150 + Math.floor(Math.random() * 3) * 50,
         };
+        soundFx.playUfo();
       }
       if (g.ufo) {
         g.ufo.x += g.ufo.speed;
-        if (g.ufo.x > g.canvasWidth + 60) {
+        if (g.ufo.x > g.canvasWidth + 90) {
           g.ufo = null;
         }
       }
@@ -635,14 +810,25 @@ export function TerminalShooter({ onExit }: TerminalShooterProps) {
 
     const render = () => {
       const g = gameRef.current;
+
+      ctx.save();
+
+      // Screen shake translation on damage
+      if (g.shakeTimer > 0) {
+        g.shakeTimer--;
+        const shakeX = (Math.random() - 0.5) * 6;
+        const shakeY = (Math.random() - 0.5) * 6;
+        ctx.translate(shakeX, shakeY);
+      }
+
       ctx.clearRect(0, 0, g.canvasWidth, g.canvasHeight);
 
-      // Background: Deep Aubergine terminal hue
+      // Deep Terminal Aubergine background
       ctx.fillStyle = "#220419";
       ctx.fillRect(0, 0, g.canvasWidth, g.canvasHeight);
 
       // CRT Scanline Pattern
-      ctx.fillStyle = "rgba(0, 0, 0, 0.15)";
+      ctx.fillStyle = "rgba(0, 0, 0, 0.16)";
       for (let y = 0; y < g.canvasHeight; y += 4) {
         ctx.fillRect(0, y, g.canvasWidth, 2);
       }
@@ -654,7 +840,7 @@ export function TerminalShooter({ onExit }: TerminalShooterProps) {
         ctx.fillText(star.char, star.x, star.y);
       }
 
-      // Render Bunkers (Firewalls)
+      // Render Bunkers (Ubuntu Defensive Firewalls)
       ctx.font = "12px 'Ubuntu Mono', monospace";
       for (const bunker of g.bunkers) {
         if (bunker.hp > 0) {
@@ -665,26 +851,34 @@ export function TerminalShooter({ onExit }: TerminalShooterProps) {
         }
       }
 
-      // Render UFO
+      // Render Mystery UFO
       if (g.ufo) {
         ctx.font = "bold 13px 'Ubuntu Mono', monospace";
-        ctx.fillStyle = "#FF6D3B";
-        ctx.fillText("<==[UFO]==>", g.ufo.x, g.ufo.y + 12);
+        ctx.fillStyle = "#FF5555";
+        ctx.fillText("<==[UFO]==>", g.ufo.x, g.ufo.y + 14);
       }
 
-      // Render Enemies
+      // Render Alien Invaders with 2-frame marching animation
+      const animFrame = Math.floor(Date.now() / 320) % 2;
       for (const e of g.enemies) {
         if (!e.alive) continue;
         ctx.font = "bold 13px 'Ubuntu Mono', monospace";
+
         if (e.type === 2) {
-          ctx.fillStyle = "#FF79C6"; // Dreadnought
-          ctx.fillText("(O_O)", e.x, e.y + 14);
+          // Boss Dreadnought
+          ctx.fillStyle = e.hp < e.maxHp ? "#FFB86C" : "#FF79C6";
+          const sprite = animFrame === 0 ? "(O_O)" : "(o_o)";
+          ctx.fillText(sprite, e.x, e.y + 15);
         } else if (e.type === 1) {
-          ctx.fillStyle = "#8BE9FD"; // Elite
-          ctx.fillText("[o.o]", e.x, e.y + 14);
+          // Elite Invader
+          ctx.fillStyle = "#8BE9FD";
+          const sprite = animFrame === 0 ? "[o.o]" : "[*.*]";
+          ctx.fillText(sprite, e.x, e.y + 15);
         } else {
-          ctx.fillStyle = "#47D472"; // Grunt
-          ctx.fillText("</^\\>", e.x, e.y + 14);
+          // Grunt Invader
+          ctx.fillStyle = "#47D472";
+          const sprite = animFrame === 0 ? "</^\\>" : "<\\^/>";
+          ctx.fillText(sprite, e.x, e.y + 15);
         }
       }
 
@@ -697,13 +891,16 @@ export function TerminalShooter({ onExit }: TerminalShooterProps) {
         } else if (pu.type === "speed") {
           ctx.fillStyle = "#50FA7B";
           ctx.fillText("[SPD]", pu.x, pu.y + 10);
+        } else if (pu.type === "shield") {
+          ctx.fillStyle = "#8BE9FD";
+          ctx.fillText("[SHD]", pu.x, pu.y + 10);
         } else {
           ctx.fillStyle = "#FF5555";
           ctx.fillText("[♥+1]", pu.x, pu.y + 10);
         }
       }
 
-      // Render Bullets
+      // Render Bullets with Arcade Neon Glow
       for (const b of g.bullets) {
         ctx.font = "bold 13px 'Ubuntu Mono', monospace";
         if (b.isEnemy) {
@@ -725,6 +922,16 @@ export function TerminalShooter({ onExit }: TerminalShooterProps) {
       }
       ctx.globalAlpha = 1.0;
 
+      // Render Floating Score Popups
+      for (const ft of g.floatingTexts) {
+        const alpha = ft.life / ft.maxLife;
+        ctx.fillStyle = ft.color;
+        ctx.globalAlpha = alpha;
+        ctx.font = "bold 12px 'Ubuntu Mono', monospace";
+        ctx.fillText(ft.text, ft.x, ft.y);
+      }
+      ctx.globalAlpha = 1.0;
+
       // Render Player Ship
       if (g.state === "playing" || g.state === "paused") {
         if (g.player.invulnerableTimer % 6 < 3) {
@@ -735,34 +942,53 @@ export function TerminalShooter({ onExit }: TerminalShooterProps) {
           ctx.fillText("</▲\\>", g.player.x, g.player.y + 12);
 
           // Thruster flame animation
-          if (Math.random() > 0.4) {
-            ctx.fillStyle = "#FFB86C";
+          if (Math.random() > 0.35) {
+            ctx.fillStyle = g.player.speedTimer > 0 ? "#50FA7B" : "#FFB86C";
             ctx.font = "10px 'Ubuntu Mono', monospace";
             ctx.fillText(" v ", g.player.x + 8, g.player.y + 22);
+          }
+
+          // Active Shield Forcefield Bubble
+          if (g.player.shieldTimer > 0) {
+            ctx.save();
+            ctx.strokeStyle = "rgba(139, 233, 253, 0.75)";
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.arc(g.player.x + g.player.width / 2, g.player.y + 8, 22, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.restore();
           }
         }
       }
 
-      // HUD Top Header in canvas
-      ctx.fillStyle = "rgba(40, 10, 30, 0.75)";
+      // Wave Announcement Banner
+      if (g.waveBannerTimer > 0 && (g.state === "playing" || g.state === "paused")) {
+        ctx.fillStyle = "rgba(233, 84, 32, 0.9)";
+        ctx.font = "bold 14px 'Ubuntu Mono', monospace";
+        ctx.textAlign = "center";
+        ctx.fillText(`>>> WAVE ${g.wave} INCOMING <<<`, g.canvasWidth / 2, 140);
+        ctx.textAlign = "left";
+      }
+
+      // HUD Top Header
+      ctx.fillStyle = "rgba(35, 8, 28, 0.85)";
       ctx.fillRect(0, 0, g.canvasWidth, 24);
       ctx.fillStyle = "#47D472";
       ctx.font = "11px 'Ubuntu Mono', monospace";
       ctx.fillText(`SCORE: ${g.score.toString().padStart(6, "0")}`, 14, 16);
       ctx.fillStyle = "#FFB86C";
-      ctx.fillText(`HIGH: ${Math.max(g.score, highScore).toString().padStart(6, "0")}`, 160, 16);
+      ctx.fillText(`HIGH: ${Math.max(g.score, g.highScore).toString().padStart(6, "0")}`, 155, 16);
       ctx.fillStyle = "#50FA7B";
-      ctx.fillText(`WAVE: ${g.wave}`, 310, 16);
+      ctx.fillText(`WAVE: ${g.wave}`, 295, 16);
       ctx.fillStyle = "#FF5555";
-      ctx.fillText(`LIVES: ${"♥ ".repeat(Math.max(0, g.lives))}`, 420, 16);
+      ctx.fillText(`LIVES: ${"♥ ".repeat(Math.max(0, g.lives))}`, 395, 16);
 
-      // Active Buffs Indicator
-      if (g.player.tripleShotTimer > 0) {
+      // Active Combo Multiplier
+      if (g.combo.count >= 2) {
+        const mult = Math.min(4, 1 + Math.floor(g.combo.count / 3));
         ctx.fillStyle = "#FFB86C";
-        ctx.fillText("[TRIPLE SHOT]", 530, 16);
-      } else if (g.player.speedTimer > 0) {
-        ctx.fillStyle = "#50FA7B";
-        ctx.fillText("[SPEED BOOST]", 530, 16);
+        ctx.font = "bold 11px 'Ubuntu Mono', monospace";
+        ctx.fillText(`COMBO x${mult}`, 540, 16);
       }
 
       // Overlays
@@ -773,24 +999,24 @@ export function TerminalShooter({ onExit }: TerminalShooterProps) {
         ctx.fillStyle = "#E95420";
         ctx.font = "bold 20px 'Ubuntu Mono', monospace";
         ctx.textAlign = "center";
-        ctx.fillText("UBUNTU TERMINAL INVADERS", g.canvasWidth / 2, 130);
+        ctx.fillText("UBUNTU TERMINAL INVADERS", g.canvasWidth / 2, 125);
 
         ctx.fillStyle = "#47D472";
         ctx.font = "13px 'Ubuntu Mono', monospace";
-        ctx.fillText("KERNEL DEFENDER MISSION", g.canvasWidth / 2, 160);
+        ctx.fillText("KERNEL DEFENDER MISSION", g.canvasWidth / 2, 155);
 
         ctx.fillStyle = "#B0B0B0";
         ctx.font = "12px 'Ubuntu Mono', monospace";
-        ctx.fillText("[Mouse Move or A / D / ← →] Move Spaceship", g.canvasWidth / 2, 210);
-        ctx.fillText("[Click or SPACEBAR] Fire Dual Plasma", g.canvasWidth / 2, 235);
-        ctx.fillText("[P] Pause Game   •   [Q / ESC] Quit to Bash", g.canvasWidth / 2, 260);
+        ctx.fillText("[Mouse Move or A / D / ← →] Move Spaceship", g.canvasWidth / 2, 205);
+        ctx.fillText("[Click or Hold SPACEBAR] Fire Dual Plasma", g.canvasWidth / 2, 230);
+        ctx.fillText("[P] Pause Game   •   [Q / ESC] Quit to Bash", g.canvasWidth / 2, 255);
 
         ctx.fillStyle = "#FFB86C";
         ctx.font = "bold 14px 'Ubuntu Mono', monospace";
-        ctx.fillText(">>> MOVE MOUSE OR CLICK TO START <<<", g.canvasWidth / 2, 320);
+        ctx.fillText(">>> CLICK OR PRESS SPACE TO START <<<", g.canvasWidth / 2, 320);
         ctx.textAlign = "left";
       } else if (g.state === "paused") {
-        ctx.fillStyle = "rgba(10, 0, 10, 0.75)";
+        ctx.fillStyle = "rgba(10, 0, 10, 0.78)";
         ctx.fillRect(0, 24, g.canvasWidth, g.canvasHeight - 24);
 
         ctx.fillStyle = "#FFB86C";
@@ -808,21 +1034,24 @@ export function TerminalShooter({ onExit }: TerminalShooterProps) {
         ctx.fillStyle = "#FF5555";
         ctx.font = "bold 24px 'Ubuntu Mono', monospace";
         ctx.textAlign = "center";
-        ctx.fillText("KERNEL PANIC: MISSION FAILED", g.canvasWidth / 2, 140);
+        ctx.fillText("KERNEL PANIC: MISSION FAILED", g.canvasWidth / 2, 135);
 
         ctx.fillStyle = "#FFFFFF";
         ctx.font = "14px 'Ubuntu Mono', monospace";
-        ctx.fillText(`FINAL SCORE: ${g.score}`, g.canvasWidth / 2, 185);
-        ctx.fillText(`WAVE REACHED: ${g.wave}`, g.canvasWidth / 2, 210);
+        ctx.fillText(`FINAL SCORE: ${g.score}`, g.canvasWidth / 2, 180);
+        ctx.fillText(`WAVE REACHED: ${g.wave}`, g.canvasWidth / 2, 205);
+        ctx.fillText(`ALL-TIME HIGH: ${Math.max(g.score, g.highScore)}`, g.canvasWidth / 2, 230);
 
         ctx.fillStyle = "#47D472";
         ctx.font = "bold 14px 'Ubuntu Mono', monospace";
-        ctx.fillText("PRESS [SPACE] TO REBOOT & PLAY AGAIN", g.canvasWidth / 2, 270);
+        ctx.fillText("PRESS [SPACE] TO REBOOT & PLAY AGAIN", g.canvasWidth / 2, 280);
         ctx.fillStyle = "#B0B0B0";
         ctx.font = "12px 'Ubuntu Mono', monospace";
-        ctx.fillText("OR PRESS [Q] TO RETURN TO TERMINAL BASH", g.canvasWidth / 2, 300);
+        ctx.fillText("OR PRESS [Q] TO RETURN TO TERMINAL BASH", g.canvasWidth / 2, 310);
         ctx.textAlign = "left";
       }
+
+      ctx.restore();
     };
 
     const loop = () => {
@@ -833,7 +1062,8 @@ export function TerminalShooter({ onExit }: TerminalShooterProps) {
 
     animId = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(animId);
-  }, [fireBullet, highScore, initLevel, saveHighScore]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Mounted once, totally decoupled from React state updates
 
   const toggleSound = () => {
     const muted = soundFx.toggleMute();
@@ -861,9 +1091,9 @@ export function TerminalShooter({ onExit }: TerminalShooterProps) {
           </button>
           <button
             type="button"
-            onClick={() => onExit(score)}
+            onClick={() => onExit(gameRef.current.score)}
             className="hover:text-[var(--ubuntu-orange)] transition-colors flex items-center gap-1 text-[11px]"
-            title="Exit game to bash prompt"
+            title="Exit game to bash prompt (Q)"
           >
             <X className="w-3.5 h-3.5" />
             <span>Quit (Q)</span>
@@ -892,13 +1122,16 @@ export function TerminalShooter({ onExit }: TerminalShooterProps) {
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onPointerDown={() => {
+            onPointerDown={(e) => {
+              e.preventDefault();
               gameRef.current.keys.left = true;
             }}
-            onPointerUp={() => {
+            onPointerUp={(e) => {
+              e.preventDefault();
               gameRef.current.keys.left = false;
             }}
-            onPointerLeave={() => {
+            onPointerLeave={(e) => {
+              e.preventDefault();
               gameRef.current.keys.left = false;
             }}
             className="w-11 h-9 rounded-lg bg-white/10 active:bg-[var(--ubuntu-orange)] text-white font-bold flex items-center justify-center text-sm shadow-md transition-colors"
@@ -908,13 +1141,16 @@ export function TerminalShooter({ onExit }: TerminalShooterProps) {
           </button>
           <button
             type="button"
-            onPointerDown={() => {
+            onPointerDown={(e) => {
+              e.preventDefault();
               gameRef.current.keys.right = true;
             }}
-            onPointerUp={() => {
+            onPointerUp={(e) => {
+              e.preventDefault();
               gameRef.current.keys.right = false;
             }}
-            onPointerLeave={() => {
+            onPointerLeave={(e) => {
+              e.preventDefault();
               gameRef.current.keys.right = false;
             }}
             className="w-11 h-9 rounded-lg bg-white/10 active:bg-[var(--ubuntu-orange)] text-white font-bold flex items-center justify-center text-sm shadow-md transition-colors"
@@ -947,7 +1183,7 @@ export function TerminalShooter({ onExit }: TerminalShooterProps) {
             </button>
             <button
               type="button"
-              onClick={() => onExit(score)}
+              onClick={() => onExit(gameRef.current.score)}
               className="px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-bold text-xs flex items-center gap-1.5 shadow-md active:scale-95 transition-transform"
               title="Quit to Terminal Bash (Q)"
             >
@@ -957,19 +1193,29 @@ export function TerminalShooter({ onExit }: TerminalShooterProps) {
           </div>
         ) : (
           <div className="hidden sm:block text-[11px] text-zinc-400">
-            [Mouse / A / D] Move • [Click / SPACE] Fire • [P] Pause
+            [Mouse / A / D] Move • [Hold Click / SPACE] Fire • [P] Pause
           </div>
         )}
 
-        {/* Action Fire Button */}
+        {/* Action Fire Button with Continuous Hold */}
         <button
           type="button"
-          onClick={() => {
-            if (gameState === "start" || gameState === "gameover") {
+          onPointerDown={(e) => {
+            e.preventDefault();
+            if (gameRef.current.state === "start" || gameRef.current.state === "gameover") {
               startGame();
             } else {
+              gameRef.current.isPointerDown = true;
               fireBullet();
             }
+          }}
+          onPointerUp={(e) => {
+            e.preventDefault();
+            gameRef.current.isPointerDown = false;
+          }}
+          onPointerLeave={(e) => {
+            e.preventDefault();
+            gameRef.current.isPointerDown = false;
           }}
           className="px-5 h-9 rounded-lg bg-emerald-600 active:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-md active:scale-95 transition-transform"
           title="Fire Plasma Weapon (Space)"
