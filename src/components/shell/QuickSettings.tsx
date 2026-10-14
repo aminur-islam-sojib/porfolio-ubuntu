@@ -166,7 +166,7 @@ export function QuickSettings() {
               : { duration: 0.22, ease: [0.16, 1, 0.3, 1] }
           }
           style={{ transformOrigin: "top right" }}
-          className="fixed top-[34px] right-2 z-[99990] w-[360px] sm:w-[380px] rounded-[26px] bg-[var(--color-qs-bg)] border border-[var(--color-qs-border)] shadow-[var(--shadow-qs)] p-3.5 space-y-3.5 select-none text-[var(--color-qs-tile-text)] transition-colors will-change-transform"
+          className="fixed top-[34px] right-2 z-[99990] w-[360px] sm:w-[380px] rounded-2xl bg-[var(--color-qs-bg)] border border-[var(--color-qs-border)] shadow-[var(--shadow-qs)] p-3.5 space-y-3.5 select-none text-[var(--color-qs-tile-text)] transition-colors will-change-transform"
           onClick={(e) => e.stopPropagation()}
         >
           {/* 1. Top Header: Battery Pill on Left & 4 Round Action Buttons on Right */}
