@@ -21,6 +21,20 @@
   --color-shell-tile-bg: var(--color-shell-tile-bg);
   --color-shell-tile-hover: var(--color-shell-tile-hover);
 
+  --color-qs-bg: var(--color-qs-bg);
+  --color-qs-border: var(--color-qs-border);
+  --color-qs-tile-bg: var(--color-qs-tile-bg);
+  --color-qs-tile-hover: var(--color-qs-tile-hover);
+  --color-qs-tile-active-bg: var(--color-qs-tile-active-bg);
+  --color-qs-tile-active-hover: var(--color-qs-tile-active-hover);
+  --color-qs-tile-text: var(--color-qs-tile-text);
+  --color-qs-tile-subtext: var(--color-qs-tile-subtext);
+  --color-qs-divider: var(--color-qs-divider);
+  --color-qs-active-divider: var(--color-qs-active-divider);
+  --color-qs-slider-track: var(--color-qs-slider-track);
+  --color-qs-slider-fill: var(--color-qs-slider-fill);
+  --shadow-qs: var(--shadow-qs);
+
   --color-window-bg: var(--color-window-bg);
   --color-window-header: var(--color-window-header);
   --color-window-header-inactive: var(--color-window-header-inactive);
@@ -137,4 +151,41 @@ body,
 
 [data-theme="light"] ::-webkit-scrollbar-thumb:hover {
   background-color: var(--ubuntu-orange, #e95420);
+}
+
+/* ==========================================================================
+   Ubuntu GNOME Quick Settings Slider Thumb
+   ========================================================================== */
+input[type="range"].ubuntu-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+}
+
+input[type="range"].ubuntu-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  background: #ffffff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  margin-top: -6px;
+  transition: transform 0.12s ease;
+}
+
+input[type="range"].ubuntu-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.12);
+}
+
+input[type="range"].ubuntu-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  background: #ffffff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  border: 1px solid rgba(0, 0, 0, 0.08);
 }

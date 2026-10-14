@@ -126,14 +126,14 @@ export default function TerminalApp() {
           <p className="text-white/60 text-xs select-none">
             Welcome to Ubuntu 24.04 LTS (GNU/Linux 6.8.0-generic x86_64).
             <br />
-            Type <span className="text-[var(--ubuntu-orange)] font-bold">&apos;game&apos;</span> to play Space Invaders or <span className="text-amber-400 font-bold">&apos;help&apos;</span> to view all commands.
+            Type <span className="text-(--ubuntu-orange) font-bold">&apos;game&apos;</span> to play Space Invaders or <span className="text-amber-400 font-bold">&apos;help&apos;</span> to view all commands.
           </p>
 
           {entries.map((item, idx) => (
             <div key={idx} className="space-y-1">
               {item.cmd && (
                 <div className="flex items-center gap-2">
-                  <span className="text-[var(--ubuntu-orange)] font-semibold select-none">
+                  <span className="text-(--ubuntu-orange) font-semibold select-none">
                     sojib@ubuntu:~$
                   </span>
                   <span className="text-white font-medium">{item.cmd}</span>
@@ -149,7 +149,7 @@ export default function TerminalApp() {
 
           {/* Active Input Line */}
           <div className="flex items-center gap-2 pt-1">
-            <span className="text-[var(--ubuntu-orange)] font-semibold select-none">
+            <span className="text-(--ubuntu-orange) font-semibold select-none">
               sojib@ubuntu:~$
             </span>
             <input
@@ -159,7 +159,7 @@ export default function TerminalApp() {
               onChange={(e) => setInputVal(e.target.value)}
               onKeyDown={handleKeyDown}
               aria-label="Terminal prompt"
-              className="flex-1 bg-transparent text-white outline-none border-none font-mono caret-[var(--ubuntu-orange)]"
+              className="flex-1 bg-transparent text-white outline-none border-none font-mono caret-(--ubuntu-orange)"
               autoFocus
               autoComplete="off"
               spellCheck="false"
@@ -198,7 +198,7 @@ export default function TerminalApp() {
                 }}
                 className={`inline-flex items-center justify-center text-center leading-none px-3 py-1.5 rounded-md text-[11px] font-mono border transition-colors whitespace-nowrap shadow-xs ${
                   qCmd.startsWith("game")
-                    ? "bg-[var(--ubuntu-orange)]/20 hover:bg-[var(--ubuntu-orange)]/35 text-[var(--ubuntu-orange)] font-bold border-[var(--ubuntu-orange)]/40"
+                    ? "bg-(--ubuntu-orange)/20 hover:bg-(--ubuntu-orange)/35 text-(--ubuntu-orange) font-bold border-(--ubuntu-orange)/40"
                     : "bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white border-white/10"
                 }`}
               >

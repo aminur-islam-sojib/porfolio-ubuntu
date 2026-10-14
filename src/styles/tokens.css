@@ -13,6 +13,21 @@
   --color-shell-tile-bg: rgba(255, 255, 255, 0.1);
   --color-shell-tile-hover: rgba(255, 255, 255, 0.15);
 
+  /* Quick Settings Shell Tokens (Ubuntu 24.04 GNOME Dark) */
+  --color-qs-bg: #1d1d1d;
+  --color-qs-border: rgba(255, 255, 255, 0.08);
+  --color-qs-tile-bg: #313131;
+  --color-qs-tile-hover: #3c3c3c;
+  --color-qs-tile-active-bg: #d34615;
+  --color-qs-tile-active-hover: #c23f12;
+  --color-qs-tile-text: #ffffff;
+  --color-qs-tile-subtext: #9e9e9e;
+  --color-qs-divider: #262626;
+  --color-qs-active-divider: #b93b12;
+  --color-qs-slider-track: #484848;
+  --color-qs-slider-fill: #e95420;
+  --shadow-qs: 0 18px 48px -4px rgba(0, 0, 0, 0.65), 0 4px 16px -2px rgba(0, 0, 0, 0.45);
+
   --color-window-bg: #1e1e1e;
   --color-window-header: #2e2e2e;
   --color-window-header-inactive: #242424;
@@ -83,6 +98,21 @@
   --color-dock-bg: rgba(230, 230, 230, 0.88);
   --color-shell-tile-bg: rgba(0, 0, 0, 0.06);
   --color-shell-tile-hover: rgba(0, 0, 0, 0.1);
+
+  /* Quick Settings Shell Tokens (Ubuntu 24.04 GNOME Light) */
+  --color-qs-bg: #fafafa;
+  --color-qs-border: rgba(0, 0, 0, 0.08);
+  --color-qs-tile-bg: #e3e3e3;
+  --color-qs-tile-hover: #d9d9d9;
+  --color-qs-tile-active-bg: #d34615;
+  --color-qs-tile-active-hover: #c23f12;
+  --color-qs-tile-text: #2e2e2e;
+  --color-qs-tile-subtext: #666666;
+  --color-qs-divider: #d0d0d0;
+  --color-qs-active-divider: #b93b12;
+  --color-qs-slider-track: #d4d4d4;
+  --color-qs-slider-fill: #e95420;
+  --shadow-qs: 0 16px 44px -4px rgba(0, 0, 0, 0.16), 0 2px 8px -2px rgba(0, 0, 0, 0.08);
 
   --color-window-bg: #fafafa;
   --color-window-header: #ebebeb;

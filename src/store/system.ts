@@ -101,6 +101,8 @@ interface SystemStoreState {
   toggleQuickSettings: () => void;
   setQuickSettingsOpen: (open: boolean) => void;
   setVolume: (volume: number) => void;
+  setWifiConnected: (connected: boolean) => void;
+  setBluetoothConnected: (connected: boolean) => void;
   addNotification: (notification: Omit<SystemNotification, "id" | "timestamp">) => void;
   dismissNotification: (id: string) => void;
 }
@@ -258,6 +260,8 @@ export const useSystemStore = create<SystemStoreState>((set, get) => ({
   setQuickSettingsOpen: (open) => set({ isQuickSettingsOpen: open }),
 
   setVolume: (volume) => set({ volume }),
+  setWifiConnected: (wifiConnected) => set({ wifiConnected }),
+  setBluetoothConnected: (bluetoothConnected) => set({ bluetoothConnected }),
 
   addNotification: (notif) => {
     const newNotif: SystemNotification = {
