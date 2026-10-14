@@ -43,7 +43,7 @@ export function AppIcon({ id, size = 40, className }: AppIconProps) {
         width={size}
         height={size}
         priority={size >= 40}
-        className="w-full h-full object-contain drop-shadow-[0_2px_6px_rgba(0,0,0,0.35)] select-none pointer-events-none transition-transform duration-150"
+        className="w-full h-full object-contain select-none pointer-events-none transition-transform duration-150"
       />
     </div>
   );

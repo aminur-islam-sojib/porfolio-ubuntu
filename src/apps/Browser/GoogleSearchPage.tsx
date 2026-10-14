@@ -53,9 +53,9 @@ export function GoogleSearchPage({ query, onNavigate }: GoogleSearchPageProps) {
   ];
 
   return (
-    <div className="w-full h-full bg-[var(--color-chrome-toolbar)] text-[var(--color-text-secondary)] font-sans overflow-y-auto select-text">
+    <div className="w-full h-full bg-[var(--color-chrome-omnibox)] text-[var(--color-text-secondary)] font-sans overflow-y-auto select-text">
       {/* Top Google Search Header */}
-      <div className="sticky top-0 bg-[var(--color-chrome-toolbar)] border-b border-[var(--color-chrome-border)] px-4 sm:px-8 py-3.5 z-10 space-y-3">
+      <div className="sticky top-0 bg-[var(--color-chrome-omnibox)] border-b border-[var(--color-chrome-border)] px-4 sm:px-8 py-3.5 z-10 space-y-3">
         <div className="flex items-center gap-4 sm:gap-6">
           <button
             type="button"
@@ -76,7 +76,7 @@ export function GoogleSearchPage({ query, onNavigate }: GoogleSearchPageProps) {
                 type="text"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                className="w-full h-10 pl-4 pr-10 rounded-full bg-[var(--color-chrome-omnibox)] text-[var(--color-text-primary)] text-xs sm:text-sm border border-[var(--color-chrome-border)] hover:border-[var(--ubuntu-orange)]/40 focus:border-[var(--ubuntu-orange)] outline-none shadow-sm"
+                className="w-full h-10 pl-4 pr-10 rounded-full bg-[var(--color-chrome-input)] text-[var(--color-text-primary)] text-xs sm:text-sm border border-[var(--color-chrome-border)] hover:border-[#5f6368] focus:border-white/30 outline-none shadow-sm"
               />
               <button
                 type="submit"
@@ -91,7 +91,7 @@ export function GoogleSearchPage({ query, onNavigate }: GoogleSearchPageProps) {
 
         {/* Search Filter Tabs */}
         <div className="flex items-center gap-6 text-xs text-[var(--color-text-muted)] pl-0 sm:pl-28">
-          <span className="text-[var(--ubuntu-orange)] font-medium border-b-2 border-[var(--ubuntu-orange)] pb-1 cursor-pointer">
+          <span className="text-[var(--color-search-link)] font-medium border-b-2 border-[var(--color-search-link)] pb-1 cursor-pointer">
             All
           </span>
           <span className="hover:text-[var(--color-text-primary)] cursor-pointer">Images</span>
@@ -109,7 +109,7 @@ export function GoogleSearchPage({ query, onNavigate }: GoogleSearchPageProps) {
 
         {/* Knowledge Panel Banner */}
         <div className="p-4 rounded-xl bg-[var(--color-card-bg)] border border-[var(--color-border-subtle)] flex items-start gap-4 text-xs shadow-sm">
-          <Sparkles className="w-5 h-5 text-[var(--ubuntu-orange)] shrink-0 mt-0.5" />
+          <Sparkles className="w-5 h-5 text-[var(--color-search-link)] shrink-0 mt-0.5" />
           <div className="space-y-1">
             <span className="font-semibold text-[var(--color-text-primary)]">Featured Developer Profile</span>
             <p className="text-[var(--color-text-secondary)] leading-relaxed">
@@ -131,7 +131,7 @@ export function GoogleSearchPage({ query, onNavigate }: GoogleSearchPageProps) {
                 <button
                   type="button"
                   onClick={() => onNavigate(res.url)}
-                  className="text-[#1a0dab] dark:text-[#8ab4f8] hover:underline text-left cursor-pointer inline-flex items-center gap-1.5 font-medium"
+                  className="text-[var(--color-search-link)] hover:underline text-left cursor-pointer inline-flex items-center gap-1.5 font-medium"
                 >
                   <span>{res.title}</span>
                   <ExternalLink className="w-3 h-3 opacity-70" />
@@ -149,7 +149,7 @@ export function GoogleSearchPage({ query, onNavigate }: GoogleSearchPageProps) {
                       key={sl.label}
                       type="button"
                       onClick={() => onNavigate(sl.url)}
-                      className="p-2 rounded-lg bg-[var(--color-card-bg)] hover:bg-[var(--color-card-hover)] text-left text-[11px] text-[#1a0dab] dark:text-[#8ab4f8] hover:underline border border-[var(--color-border-subtle)] shadow-xs"
+                      className="p-2 rounded-lg bg-[var(--color-card-bg)] hover:bg-[var(--color-card-hover)] text-left text-[11px] text-[var(--color-search-link)] hover:underline border border-[var(--color-border-subtle)] shadow-xs"
                     >
                       {sl.label}
                     </button>

@@ -123,7 +123,7 @@ export function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps
         </div>
 
         {/* Action Footer */}
-        <div className="p-4 bg-[var(--color-window-header)] border-t border-[var(--color-border-subtle)] flex items-center justify-end gap-3">
+        <div className="p-4 bg-[var(--color-window-bg)] border-t border-[var(--color-border-subtle)] flex items-center justify-end gap-3">
           {project.githubUrl && (
             <a href={project.githubUrl} target="_blank" rel="noopener noreferrer">
               <Button variant="default" size="sm" className="gap-1.5">

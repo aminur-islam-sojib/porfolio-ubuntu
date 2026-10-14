@@ -8,6 +8,7 @@ import { PhoneShell } from "@/components/mobile/PhoneShell";
 import { TabletShell } from "@/components/mobile/TabletShell";
 import { DeepLinkHandler } from "@/components/shell/DeepLinkHandler";
 import { FullscreenPrompt } from "@/components/shell/FullscreenPrompt";
+import { Oneko } from "@/components/shell/Oneko";
 import { useSystemStore } from "@/store/system";
 
 export function AppShell() {
@@ -31,6 +32,16 @@ export function AppShell() {
         useSystemStore.getState().setAccentColor(savedAccent);
       }
 
+      const savedFont = localStorage.getItem("ubuntu_font") as import("@/store/system").SystemFontFamily | null;
+      if (savedFont) {
+        useSystemStore.getState().setFont(savedFont);
+      }
+
+      const savedOneko = localStorage.getItem("ubuntu_oneko");
+      if (savedOneko === "true") {
+        useSystemStore.getState().setOneko(true);
+      }
+
       const savedCustom = localStorage.getItem("ubuntu_custom_wallpapers");
       if (savedCustom) {
         useSystemStore.setState({ customWallpapers: JSON.parse(savedCustom) });
@@ -42,6 +53,7 @@ export function AppShell() {
     <>
       <DeepLinkHandler />
       <FullscreenPrompt />
+      <Oneko />
       {mode === null ? (
         <div className="fixed inset-0 bg-[#111111] overflow-hidden select-none">
           <Wallpaper />

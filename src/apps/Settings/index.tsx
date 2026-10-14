@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Image from "next/image";
-import { useSystemStore } from "@/store/system";
+import { useSystemStore, SYSTEM_FONTS } from "@/store/system";
 import { UBUNTU_WALLPAPERS } from "@/data/wallpapers";
 import {
   Palette,
@@ -28,6 +28,8 @@ import {
   Info,
   Check,
   Plus,
+  Type,
+  RotateCcw,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 
@@ -46,6 +48,7 @@ const UBUNTU_ACCENTS = [
 
 type SettingsSection =
   | "appearance"
+  | "fonts"
   | "desktop"
   | "displays"
   | "sound"
@@ -59,12 +62,20 @@ export default function SettingsApp() {
   const theme = useSystemStore((state) => state.theme);
   const wallpaper = useSystemStore((state) => state.wallpaper);
   const accentColor = useSystemStore((state) => state.accentColor);
+  const font = useSystemStore((state) => state.font);
   const customWallpapers = useSystemStore((state) => state.customWallpapers);
 
   const setWallpaper = useSystemStore((state) => state.setWallpaper);
   const setAccentColor = useSystemStore((state) => state.setAccentColor);
   const setTheme = useSystemStore((state) => state.setTheme);
+  const setFont = useSystemStore((state) => state.setFont);
   const addCustomWallpaper = useSystemStore((state) => state.addCustomWallpaper);
+
+  // Typography test sandbox state
+  const [testText, setTestText] = React.useState(
+    "The quick brown fox jumps over the lazy dog 0123456789"
+  );
+  const [testFontSize, setTestFontSize] = React.useState<number>(18);
 
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -86,7 +97,7 @@ export default function SettingsApp() {
   return (
     <div className="flex h-full w-full bg-[var(--color-window-bg)] text-[var(--color-text-primary)] font-sans select-none overflow-hidden">
       {/* 1. Left Sidebar */}
-      <aside className="w-56 shrink-0 bg-[var(--color-window-header)] border-r border-[var(--color-border-subtle)] flex flex-col h-full">
+      <aside className="w-56 shrink-0 bg-[var(--color-sidebar-bg)] border-r border-[var(--color-border-subtle)] flex flex-col h-full">
         {/* Search header */}
         <div className="p-3 border-b border-[var(--color-border-subtle)]">
           <div className="relative">
@@ -155,6 +166,12 @@ export default function SettingsApp() {
             label="Appearance"
             active={activeSection === "appearance"}
             onClick={() => setActiveSection("appearance")}
+          />
+          <SidebarItem
+            icon={Type}
+            label="Fonts & Typography"
+            active={activeSection === "fonts"}
+            onClick={() => setActiveSection("fonts")}
           />
           <SidebarItem
             icon={Layout}
@@ -301,6 +318,63 @@ export default function SettingsApp() {
               </div>
             </div>
 
+            {/* Section 1.5: System Font */}
+            <div className="bg-[var(--color-card-bg)] border border-[var(--color-border-subtle)] rounded-2xl p-5 space-y-4 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-sm font-semibold text-[var(--color-text-primary)]">System Font</h2>
+                  <p className="text-xs text-[var(--color-text-muted)] mt-0.5">
+                    Select the interface typeface for windows, menus, and desktop components.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setActiveSection("fonts")}
+                  className="text-xs text-[var(--ubuntu-orange)] hover:underline font-medium flex items-center gap-1 group"
+                >
+                  <span>Typography Studio</span>
+                  <span className="transition-transform group-hover:translate-x-0.5">→</span>
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {SYSTEM_FONTS.map((fontOpt) => {
+                  const isSelected = font === fontOpt.id;
+                  return (
+                    <button
+                      key={fontOpt.id}
+                      type="button"
+                      onClick={() => setFont(fontOpt.id)}
+                      style={{ fontFamily: fontOpt.fontFamily }}
+                      className={cn(
+                        "p-3 rounded-xl border text-left transition-all duration-150 flex flex-col justify-between group relative",
+                        isSelected
+                          ? "ring-2 ring-[var(--ubuntu-orange)] bg-[var(--color-card-active)] border-transparent shadow-sm"
+                          : "border-[var(--color-border-subtle)] bg-[var(--color-control-bg)] hover:bg-[var(--color-control-hover)]"
+                      )}
+                    >
+                      <div className="flex items-center justify-between w-full mb-1">
+                        <span className="text-xs font-semibold text-[var(--color-text-primary)]">
+                          {fontOpt.name}
+                        </span>
+                        {isSelected && (
+                          <div className="w-4 h-4 rounded-full bg-[var(--ubuntu-orange)] text-white flex items-center justify-center shadow">
+                            <Check className="w-2.5 h-2.5 stroke-[3]" />
+                          </div>
+                        )}
+                      </div>
+                      <p className="text-[10px] text-[var(--color-text-muted)] line-clamp-1 mb-2 font-normal">
+                        {fontOpt.category}
+                      </p>
+                      <div className="text-xs text-[var(--color-text-secondary)] font-normal tracking-wide">
+                        Aa Bb Gg 123
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
             {/* Section 2: Background Wallpapers Grid */}
             <div className="bg-[var(--color-card-bg)] border border-[var(--color-border-subtle)] rounded-2xl p-5 space-y-4 shadow-sm">
               <div className="flex items-center justify-between">
@@ -409,6 +483,237 @@ export default function SettingsApp() {
                     </button>
                   );
                 })}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Fonts & Typography Section */}
+        {activeSection === "fonts" && (
+          <div className="max-w-3xl mx-auto space-y-6 animate-in fade-in duration-200">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-[var(--color-border-subtle)]">
+              <div>
+                <h1 className="text-xl font-bold tracking-tight text-[var(--color-text-primary)]">
+                  Fonts & Typography
+                </h1>
+                <p className="text-xs text-[var(--color-text-muted)] mt-1">
+                  Configure desktop typefaces, inspect typographic specimens, and test readability.
+                </p>
+              </div>
+              {font !== "ubuntu" && (
+                <button
+                  type="button"
+                  onClick={() => setFont("ubuntu")}
+                  className="self-start sm:self-auto px-3 py-1.5 rounded-lg border border-[var(--color-border-subtle)] bg-[var(--color-control-bg)] hover:bg-[var(--color-control-hover)] text-xs font-medium text-[var(--color-text-primary)] flex items-center gap-1.5 transition-colors shadow-sm"
+                >
+                  <RotateCcw className="w-3.5 h-3.5 text-[var(--ubuntu-orange)]" />
+                  <span>Restore Ubuntu Default</span>
+                </button>
+              )}
+            </div>
+
+            {/* Current Active Font Summary Banner */}
+            {(() => {
+              const activeFontObj = SYSTEM_FONTS.find((f) => f.id === font) ?? SYSTEM_FONTS[0];
+              return (
+                <div className="bg-[var(--color-card-bg)] border border-[var(--color-border-subtle)] rounded-2xl p-5 space-y-3 shadow-sm">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-[var(--ubuntu-orange)]">
+                      Current Desktop Font
+                    </span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--ubuntu-orange)]/15 text-[var(--ubuntu-orange)] font-medium">
+                      Active System-Wide
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-4">
+                    <h2
+                      style={{ fontFamily: activeFontObj.fontFamily }}
+                      className="text-2xl sm:text-3xl font-bold text-[var(--color-text-primary)] tracking-tight"
+                    >
+                      {activeFontObj.name}
+                    </h2>
+                    <span className="text-xs text-[var(--color-text-muted)]">
+                      {activeFontObj.category} — {activeFontObj.description}
+                    </span>
+                  </div>
+
+                  <p
+                    style={{ fontFamily: activeFontObj.fontFamily }}
+                    className="text-sm text-[var(--color-text-secondary)] italic pt-1 border-t border-[var(--color-border-subtle)]"
+                  >
+                    &ldquo;{activeFontObj.sample}&rdquo;
+                  </p>
+                </div>
+              );
+            })()}
+
+            {/* Font Family Catalog Cards */}
+            <div className="bg-[var(--color-card-bg)] border border-[var(--color-border-subtle)] rounded-2xl p-5 space-y-4 shadow-sm">
+              <h2 className="text-sm font-semibold text-[var(--color-text-primary)]">
+                Available System Fonts
+              </h2>
+
+              <div className="grid grid-cols-1 gap-3">
+                {SYSTEM_FONTS.map((fontOpt) => {
+                  const isSelected = font === fontOpt.id;
+                  return (
+                    <div
+                      key={fontOpt.id}
+                      onClick={() => setFont(fontOpt.id)}
+                      className={cn(
+                        "p-4 rounded-xl border text-left cursor-pointer transition-all duration-150 flex flex-col md:flex-row md:items-center justify-between gap-4 group",
+                        isSelected
+                          ? "ring-2 ring-[var(--ubuntu-orange)] bg-[var(--color-card-active)] border-transparent shadow-sm"
+                          : "border-[var(--color-border-subtle)] bg-[var(--color-control-bg)] hover:bg-[var(--color-control-hover)]"
+                      )}
+                    >
+                      {/* Left: Info & Specimen */}
+                      <div className="space-y-1.5 flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span
+                            style={{ fontFamily: fontOpt.fontFamily }}
+                            className="text-base font-bold text-[var(--color-text-primary)]"
+                          >
+                            {fontOpt.name}
+                          </span>
+                          <span className="text-[10px] px-2 py-0.5 rounded bg-[var(--color-card-bg)] text-[var(--color-text-muted)] border border-[var(--color-border-subtle)]">
+                            {fontOpt.category}
+                          </span>
+                          {fontOpt.id === "ubuntu" && (
+                            <span className="text-[10px] px-2 py-0.5 rounded bg-orange-500/10 text-[var(--ubuntu-orange)] font-medium">
+                              Default
+                            </span>
+                          )}
+                        </div>
+
+                        <p className="text-xs text-[var(--color-text-muted)]">
+                          {fontOpt.description}
+                        </p>
+
+                        <div
+                          style={{ fontFamily: fontOpt.fontFamily }}
+                          className="text-sm text-[var(--color-text-primary)] pt-1 select-text"
+                        >
+                          {fontOpt.sample}
+                        </div>
+
+                        <div
+                          style={{ fontFamily: fontOpt.fontFamily }}
+                          className="text-xs text-[var(--color-text-muted)] tracking-wider"
+                        >
+                          ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789
+                        </div>
+                      </div>
+
+                      {/* Right: Selection Action */}
+                      <div className="flex md:flex-col items-center md:items-end justify-between gap-2 shrink-0">
+                        {isSelected ? (
+                          <div className="flex items-center gap-1.5 text-xs font-semibold text-[var(--ubuntu-orange)] px-3 py-1.5 rounded-lg bg-[var(--ubuntu-orange)]/10">
+                            <Check className="w-3.5 h-3.5 stroke-[3]" />
+                            <span>Selected</span>
+                          </div>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setFont(fontOpt.id);
+                            }}
+                            className="px-3 py-1.5 rounded-lg border border-[var(--color-border-subtle)] bg-[var(--color-card-bg)] hover:bg-[var(--color-control-hover)] text-xs font-medium text-[var(--color-text-primary)] transition-colors"
+                          >
+                            Apply Font
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Interactive Type Tester & Sandbox */}
+            <div className="bg-[var(--color-card-bg)] border border-[var(--color-border-subtle)] rounded-2xl p-5 space-y-4 shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <div>
+                  <h2 className="text-sm font-semibold text-[var(--color-text-primary)]">
+                    Interactive Type Tester
+                  </h2>
+                  <p className="text-xs text-[var(--color-text-muted)]">
+                    Test live rendering, font size scaling, and weights in the active font.
+                  </p>
+                </div>
+
+                {/* Font size control */}
+                <div className="flex items-center gap-2 self-start sm:self-auto">
+                  <span className="text-xs text-[var(--color-text-muted)]">Size:</span>
+                  <input
+                    type="range"
+                    min="12"
+                    max="36"
+                    value={testFontSize}
+                    onChange={(e) => setTestFontSize(Number(e.target.value))}
+                    className="w-24 accent-[var(--ubuntu-orange)] cursor-pointer"
+                  />
+                  <span className="text-xs font-mono text-[var(--color-text-primary)] w-8 text-right">
+                    {testFontSize}px
+                  </span>
+                </div>
+              </div>
+
+              {/* Editable tester input */}
+              <div>
+                <input
+                  type="text"
+                  value={testText}
+                  onChange={(e) => setTestText(e.target.value)}
+                  placeholder="Type anything here to test..."
+                  className="w-full px-3.5 py-2 text-sm rounded-xl bg-[var(--color-input-bg)] border border-[var(--color-input-border)] text-[var(--color-text-primary)] placeholder-[var(--color-text-muted)] focus:outline-none focus:border-[var(--ubuntu-orange)] transition-colors"
+                />
+              </div>
+
+              {/* Dynamic specimen preview */}
+              <div className="p-4 rounded-xl bg-[var(--color-control-bg)] border border-[var(--color-border-subtle)] space-y-3">
+                <div className="text-[10px] uppercase font-semibold text-[var(--color-text-muted)] tracking-wider">
+                  Live Preview ({testFontSize}px)
+                </div>
+                <div
+                  style={{ fontSize: `${testFontSize}px` }}
+                  className="text-[var(--color-text-primary)] leading-relaxed break-words transition-all"
+                >
+                  {testText || "The quick brown fox jumps over the lazy dog"}
+                </div>
+              </div>
+
+              {/* Weights specimen grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+                <div className="p-3 rounded-lg bg-[var(--color-control-bg)] border border-[var(--color-border-subtle)] space-y-1">
+                  <div className="text-[10px] text-[var(--color-text-muted)] font-medium">Regular (400)</div>
+                  <div className="text-xs font-normal text-[var(--color-text-primary)] truncate">
+                    {testText || "Sample Text"}
+                  </div>
+                </div>
+                <div className="p-3 rounded-lg bg-[var(--color-control-bg)] border border-[var(--color-border-subtle)] space-y-1">
+                  <div className="text-[10px] text-[var(--color-text-muted)] font-medium">Medium (500)</div>
+                  <div className="text-xs font-medium text-[var(--color-text-primary)] truncate">
+                    {testText || "Sample Text"}
+                  </div>
+                </div>
+                <div className="p-3 rounded-lg bg-[var(--color-control-bg)] border border-[var(--color-border-subtle)] space-y-1">
+                  <div className="text-[10px] text-[var(--color-text-muted)] font-medium">Bold (700)</div>
+                  <div className="text-xs font-bold text-[var(--color-text-primary)] truncate">
+                    {testText || "Sample Text"}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Architecture / Monospace Note */}
+            <div className="p-4 rounded-2xl bg-[var(--color-control-bg)]/60 border border-[var(--color-border-subtle)] flex items-start gap-3 text-xs text-[var(--color-text-muted)] leading-relaxed">
+              <Type className="w-4 h-4 text-[var(--ubuntu-orange)] shrink-0 mt-0.5" />
+              <div>
+                <strong className="text-[var(--color-text-primary)]">System Typography Note:</strong> Choosing a font changes the UI typeface across all windows, top bar, dock, and applications. Developer environments (Terminal and VS Code) remain locked to <span className="font-mono text-[var(--color-text-primary)]">Ubuntu Mono</span> to guarantee fixed-width CLI alignment and authentic terminal behavior.
               </div>
             </div>
           </div>

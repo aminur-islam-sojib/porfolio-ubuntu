@@ -2,6 +2,8 @@
 
 import * as React from "react";
 import { executeCommand, autoCompleteCommand } from "@/apps/Terminal/commands";
+import { formatAnsiToReact } from "@/apps/Terminal/ansi";
+import { TerminalShooter } from "@/apps/Terminal/TerminalShooter";
 
 interface HistoryEntry {
   cmd: string;
@@ -9,6 +11,7 @@ interface HistoryEntry {
 }
 
 export default function TerminalApp() {
+  const [isGameActive, setIsGameActive] = React.useState(false);
   const [inputVal, setInputVal] = React.useState("");
   const [entries, setEntries] = React.useState<HistoryEntry[]>([
     {
@@ -81,6 +84,13 @@ export default function TerminalApp() {
       setCommandHistory((prev) => [...prev, trimmed]);
       setHistoryPointer(-1);
 
+      if (res.action === "game") {
+        setEntries((prev) => [...prev, { cmd: trimmed, output: res.output }]);
+        setIsGameActive(true);
+        setInputVal("");
+        return;
+      }
+
       if (res.shouldClear) {
         setEntries([]);
       } else {
@@ -90,6 +100,21 @@ export default function TerminalApp() {
       setInputVal("");
     }
   };
+
+  const handleExitGame = (score: number) => {
+    setIsGameActive(false);
+    setEntries((prev) => [
+      ...prev,
+      {
+        cmd: "exit invaders",
+        output: `[SESSION: Game Over]\nTerminal Invaders terminated. Final Score: ${score} pts.\nType 'game' to play again anytime!`,
+      },
+    ]);
+  };
+
+  if (isGameActive) {
+    return <TerminalShooter onExit={handleExitGame} />;
+  }
 
   return (
     <div
@@ -101,14 +126,14 @@ export default function TerminalApp() {
           <p className="text-white/60 text-xs select-none">
             Welcome to Ubuntu 24.04 LTS (GNU/Linux 6.8.0-generic x86_64).
             <br />
-            Type <span className="text-[var(--ubuntu-orange)] font-bold">&apos;help&apos;</span> to explore portfolio commands or press <span className="text-amber-400 font-bold">&apos;Tab&apos;</span> to auto-complete.
+            Type <span className="text-(--ubuntu-orange) font-bold">&apos;game&apos;</span> to play Space Invaders or <span className="text-amber-400 font-bold">&apos;help&apos;</span> to view all commands.
           </p>
 
           {entries.map((item, idx) => (
             <div key={idx} className="space-y-1">
               {item.cmd && (
                 <div className="flex items-center gap-2">
-                  <span className="text-[var(--ubuntu-orange)] font-semibold select-none">
+                  <span className="text-(--ubuntu-orange) font-semibold select-none">
                     sojib@ubuntu:~$
                   </span>
                   <span className="text-white font-medium">{item.cmd}</span>
@@ -116,7 +141,7 @@ export default function TerminalApp() {
               )}
               {item.output && (
                 <pre className="text-[#47D472] whitespace-pre-wrap font-mono leading-relaxed pl-1">
-                  {item.output}
+                  {formatAnsiToReact(item.output)}
                 </pre>
               )}
             </div>
@@ -124,7 +149,7 @@ export default function TerminalApp() {
 
           {/* Active Input Line */}
           <div className="flex items-center gap-2 pt-1">
-            <span className="text-[var(--ubuntu-orange)] font-semibold select-none">
+            <span className="text-(--ubuntu-orange) font-semibold select-none">
               sojib@ubuntu:~$
             </span>
             <input
@@ -134,31 +159,52 @@ export default function TerminalApp() {
               onChange={(e) => setInputVal(e.target.value)}
               onKeyDown={handleKeyDown}
               aria-label="Terminal prompt"
-              className="flex-1 bg-transparent text-white outline-none border-none font-mono caret-[var(--ubuntu-orange)]"
+              className="flex-1 bg-transparent text-white outline-none border-none font-mono caret-(--ubuntu-orange)"
               autoFocus
               autoComplete="off"
               spellCheck="false"
             />
           </div>
 
-          {/* Quick Command Pills for Touch & Mobile Devices */}
-          <div className="flex items-center gap-1.5 pt-3 overflow-x-auto select-none border-t border-white/5">
-            {["neofetch", "skills", "projects", "cat resume.md", "cowsay", "clear"].map((qCmd) => (
+          {/* Quick Command Pills for Touch & Mobile Devices (5-6 suggestions) */}
+          <div className="pt-3 border-t border-white/5 flex items-center gap-2 overflow-x-auto select-none w-full">
+            {[
+              "game 🚀",
+              "petsay",
+              "neofetch",
+              "skills",
+              "projects",
+              "clear",
+            ].map((qCmd) => (
               <button
                 key={qCmd}
                 type="button"
                 onClick={() => {
-                  if (qCmd === "clear") {
+                  const cmdToRun = qCmd.startsWith("game") ? "game" : qCmd;
+                  if (cmdToRun === "game") {
+                    const res = executeCommand("game");
+                    setEntries((prev) => [...prev, { cmd: "game", output: res.output }]);
+                    setCommandHistory((prev) => [...prev, "game"]);
+                    setIsGameActive(true);
+                    return;
+                  }
+                  if (cmdToRun === "clear") {
                     setEntries([]);
                     return;
                   }
-                  const res = executeCommand(qCmd);
-                  setEntries((prev) => [...prev, { cmd: qCmd, output: res.output }]);
-                  setCommandHistory((prev) => [...prev, qCmd]);
+                  const res = executeCommand(cmdToRun);
+                  setEntries((prev) => [...prev, { cmd: cmdToRun, output: res.output }]);
+                  setCommandHistory((prev) => [...prev, cmdToRun]);
                 }}
-                className="px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 text-[11px] text-zinc-400 hover:text-white border border-white/10 transition-colors whitespace-nowrap"
+                className={`inline-flex items-center justify-center text-center leading-none px-3 py-1.5 rounded-md text-[11px] font-mono border transition-colors whitespace-nowrap shadow-xs ${
+                  qCmd.startsWith("game")
+                    ? "bg-(--ubuntu-orange)/20 hover:bg-(--ubuntu-orange)/35 text-(--ubuntu-orange) font-bold border-(--ubuntu-orange)/40"
+                    : "bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white border-white/10"
+                }`}
               >
-                {qCmd}
+                <span className="inline-flex items-center justify-center text-center leading-none">
+                  {qCmd}
+                </span>
               </button>
             ))}
           </div>

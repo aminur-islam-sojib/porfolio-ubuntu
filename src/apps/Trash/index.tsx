@@ -30,7 +30,7 @@ export default function TrashApp() {
   return (
     <div className="h-full w-full flex flex-col bg-[var(--color-window-bg)] text-[var(--color-text-primary)] font-sans text-xs select-none">
       {/* Top Action Bar */}
-      <div className="h-10 px-4 bg-[var(--color-window-header-inactive)] border-b border-[var(--color-border-subtle)] flex items-center justify-between">
+      <div className="h-10 px-4 bg-[var(--color-subbar-bg)] border-b border-[var(--color-border-subtle)] flex items-center justify-between">
         <span className="text-[var(--color-text-secondary)]">
           {items.length} {items.length === 1 ? "item" : "items"} in Trash
         </span>
