@@ -66,9 +66,6 @@ export function Wallpaper() {
           />
         </div>
       )}
-
-      {/* 3. Subtle ambient dark vignette for top bar and dock contrast */}
-      <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-black/25 via-transparent to-black/35" />
     </div>
   );
 }

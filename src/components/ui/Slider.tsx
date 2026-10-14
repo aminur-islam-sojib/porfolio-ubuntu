@@ -68,7 +68,7 @@ export function Slider({
         disabled={disabled}
         aria-label={ariaLabel}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="ubuntu-slider w-full h-[4px] rounded-full appearance-none cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ubuntu-orange)] disabled:opacity-50"
+        className="ubuntu-slider w-full h-1 rounded-full appearance-none cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--ubuntu-orange) disabled:opacity-50"
         style={{
           background: `linear-gradient(to right, var(--color-qs-slider-fill, #e95420) 0%, var(--color-qs-slider-fill, #e95420) ${percentage}%, var(--color-qs-slider-track, #484848) ${percentage}%, var(--color-qs-slider-track, #484848) 100%)`,
         }}

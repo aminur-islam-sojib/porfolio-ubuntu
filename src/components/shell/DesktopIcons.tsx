@@ -125,14 +125,14 @@ export function DesktopIcons() {
               onClick={(e) => handleIconClick(e, item.id)}
               onDoubleClick={(e) => handleIconDoubleClick(e, item.id)}
               className={cn(
-                "flex flex-col items-center justify-center p-2 rounded-lg w-24 text-center transition-all duration-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--ubuntu-orange)]",
+                "flex flex-col items-center justify-center p-2 rounded-md w-23 text-center transition-all duration-100 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-(--ubuntu-orange)",
                 isSelected
                   ? "bg-white/20 shadow-sm backdrop-blur-xs ring-1 ring-white/30"
                   : "hover:bg-white/10"
               )}
             >
-              <AppIcon id={item.id} size={44} className="mb-1.5 pointer-events-none" />
-              <span className="text-xs font-medium text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] leading-tight line-clamp-1 pointer-events-none">
+              <AppIcon id={item.id} size={48} className="mb-1 pointer-events-none" />
+              <span className="text-[12px] font-normal text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.6)] leading-tight line-clamp-1 pointer-events-none">
                 {item.label}
               </span>
             </button>
@@ -144,7 +144,7 @@ export function DesktopIcons() {
       {selectionStyle && selectionStyle.width > 2 && selectionStyle.height > 2 && (
         <div
           style={selectionStyle}
-          className="fixed pointer-events-none z-[9000] bg-[var(--ubuntu-orange)]/15 border border-[var(--ubuntu-orange)]/70 rounded-xs"
+          className="fixed pointer-events-none z-[9000] bg-(--ubuntu-orange)/15 border border-(--ubuntu-orange)/70 rounded-xs"
         />
       )}
     </div>
