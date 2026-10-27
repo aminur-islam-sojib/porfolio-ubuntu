@@ -17,6 +17,17 @@ export function AppShell() {
   // Root-level hydration of user appearance preferences
   React.useEffect(() => {
     try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const forceBoot = urlParams.has("boot");
+      const hasBooted = sessionStorage.getItem("ubuntu_booted");
+      if (!hasBooted || forceBoot) {
+        useSystemStore.setState({ isBooting: true });
+      } else {
+        const isUnlocked = sessionStorage.getItem("ubuntu_unlocked");
+        if (!isUnlocked) {
+          useSystemStore.setState({ isLocked: true });
+        }
+      }
       const savedTheme = localStorage.getItem("ubuntu_theme") as "dark" | "light" | null;
       if (savedTheme) {
         useSystemStore.getState().setTheme(savedTheme);

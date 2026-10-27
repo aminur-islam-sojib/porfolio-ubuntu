@@ -204,6 +204,11 @@ export const useSystemStore = create<SystemStoreState>((set, get) => ({
   finishBoot: () => {
     if (typeof window !== "undefined") {
       sessionStorage.setItem("ubuntu_booted", "true");
+      const isUnlocked = sessionStorage.getItem("ubuntu_unlocked");
+      if (!isUnlocked) {
+        set({ isBooting: false, isLocked: true });
+        return;
+      }
     }
     set({ isBooting: false });
   },

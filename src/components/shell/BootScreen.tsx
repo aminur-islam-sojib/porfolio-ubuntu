@@ -5,6 +5,7 @@ import { useReducedMotion } from "@/hooks/useReducedMotion";
 import { enterFullscreen } from "@/lib/fullscreen";
 import { playUbuntuStartupChime } from "@/lib/audio";
 import { cn } from "@/lib/cn";
+import { BrandLogo } from "@/components/ui/BrandLogo";
 
 export interface BootScreenProps {
   onComplete: () => void;
@@ -83,19 +84,15 @@ export function BootScreen({ onComplete }: BootScreenProps) {
         isFadingOut ? "opacity-0 pointer-events-none" : "opacity-100"
       )}
     >
-      {/* 1. OEM Brand Logo Section (Top Center / Upper Third) */}
+      {/* 1. Personal Brand Logo Section (Top Center / Upper Third) */}
       <div className="flex-1 flex flex-col items-center justify-center pt-10 sm:pt-14">
         <div className="flex flex-col items-center select-none text-center">
-          {/* Sleek Modern Slash Monogram (HP Spectre / Modern Luxury Tech aesthetic) */}
-          <div className="flex items-end gap-1.5 h-14 sm:h-16">
-            {/* Slash 1 (tall) */}
-            <div className="w-1.5 sm:w-2 h-12 sm:h-14 bg-white rounded-full -skew-x-[22deg] shadow-[0_0_12px_rgba(255,255,255,0.45)]" />
-            {/* Slash 2 (short) */}
-            <div className="w-1.5 sm:w-2 h-8 sm:h-9 bg-white rounded-full -skew-x-[22deg] shadow-[0_0_12px_rgba(255,255,255,0.45)]" />
-            {/* Slash 3 (tall) */}
-            <div className="w-1.5 sm:w-2 h-12 sm:h-14 bg-white rounded-full -skew-x-[22deg] shadow-[0_0_12px_rgba(255,255,255,0.45)]" />
-            {/* Slash 4 (medium) */}
-            <div className="w-1.5 sm:w-2 h-9 sm:h-10 bg-white rounded-full -skew-x-[22deg] shadow-[0_0_12px_rgba(255,255,255,0.45)]" />
+          {/* Personal Brand Logo Monogram */}
+          <div className="relative flex items-center justify-center h-16 sm:h-20 w-auto mb-1">
+            <BrandLogo
+              glow
+              className="h-14 sm:h-16 w-auto text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.6)]"
+            />
           </div>
 
           {/* User Brand Wordmark */}
@@ -103,7 +100,7 @@ export function BootScreen({ onComplete }: BootScreenProps) {
             SOJIB
           </span>
 
-          {/* Security / Subsystem Badge (1:1 visual match with reference photo) */}
+          {/* Security / Subsystem Badge */}
           <div className="flex flex-col items-center mt-3 sm:mt-4 space-y-1">
             <span className="text-[8px] sm:text-[9px] font-mono tracking-[0.25em] text-white/55 uppercase">
               PROTECTED BY

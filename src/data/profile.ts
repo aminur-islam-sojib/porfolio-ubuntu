@@ -11,6 +11,8 @@ export interface Profile {
   birthday: string;
   website: string;
   avatarUrl: string;
+  brandLogoUrl: string;
+  brandLogoPng: string;
   resumeUrl: string;
   socials: {
     github: string;
@@ -51,6 +53,8 @@ export const profileData: Profile = {
   birthday: "Feb 20, 2006",
   website: "https://sojibahmed.vercel.app",
   avatarUrl: "/avatars/sojib_profile.jpg",
+  brandLogoUrl: "/avatars/brand logo.svg",
+  brandLogoPng: "/avatars/brand logo.png",
   resumeUrl: "/Sojib_Ahmed_Resume.pdf",
   socials: {
     github: "https://github.com/aminur-islam-sojib",

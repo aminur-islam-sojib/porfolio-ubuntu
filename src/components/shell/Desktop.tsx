@@ -29,8 +29,11 @@ export function Desktop() {
 
   // Check initial session boot, lock status, and appearance preferences
   React.useEffect(() => {
+    const urlParams = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+    const forceBoot = urlParams?.has("boot");
     const hasBooted = sessionStorage.getItem("ubuntu_booted");
-    if (!hasBooted) {
+    if (!hasBooted || forceBoot) {
+
       useSystemStore.setState({ isBooting: true });
     } else {
       const isUnlocked = sessionStorage.getItem("ubuntu_unlocked");
